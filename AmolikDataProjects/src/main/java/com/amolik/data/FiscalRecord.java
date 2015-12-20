@@ -2,211 +2,215 @@ package com.amolik.data;
 
 public class FiscalRecord {
 	
-	private String field1;
-	private String field2;
-	private String field3;
-	private String field4;
-	private String field5;
-	private String field6;
-	private String field7;
-	private String field8;
-	private String field9;
-	private String field10;
-	private String field11;
-	private String field12;
-	private String field13;
-	private String field14;
-	private String field15;
-	private String field16;
-	private String field17;
-	private String field18;
-	private String field19;
-	private String field20;
-	private String field21;
-	private String field22;
-	private String field23;
-	private String field24;
-	private String field25;
-	private String field26;
-	private String field27;
-	private String field28;
-	private String field29;
-	public String getField1() {
-		return field1;
-	}
-	public void setField1(String field1) {
-		this.field1 = field1;
-	}
-	public String getField2() {
-		return field2;
-	}
-	public void setField2(String field2) {
-		this.field2 = field2;
-	}
-	public String getField3() {
-		return field3;
-	}
-	public void setField3(String field3) {
-		this.field3 = field3;
-	}
-	public String getField4() {
-		return field4;
-	}
-	public void setField4(String field4) {
-		this.field4 = field4;
-	}
-	public String getField5() {
-		return field5;
-	}
-	public void setField5(String field5) {
-		this.field5 = field5;
-	}
-	public String getField6() {
-		return field6;
-	}
-	public void setField6(String field6) {
-		this.field6 = field6;
-	}
-	public String getField7() {
-		return field7;
-	}
-	public void setField7(String field7) {
-		this.field7 = field7;
-	}
-	public String getField8() {
-		return field8;
-	}
-	public void setField8(String field8) {
-		this.field8 = field8;
-	}
-	public String getField9() {
-		return field9;
-	}
-	public void setField9(String field9) {
-		this.field9 = field9;
-	}
-	public String getField10() {
-		return field10;
-	}
-	public void setField10(String field10) {
-		this.field10 = field10;
-	}
-	public String getField11() {
-		return field11;
-	}
-	public void setField11(String field11) {
-		this.field11 = field11;
-	}
-	public String getField12() {
-		return field12;
-	}
-	public void setField12(String field12) {
-		this.field12 = field12;
-	}
-	public String getField13() {
-		return field13;
-	}
-	public void setField13(String field13) {
-		this.field13 = field13;
-	}
-	public String getField14() {
-		return field14;
-	}
-	public void setField14(String field14) {
-		this.field14 = field14;
-	}
-	public String getField15() {
-		return field15;
-	}
-	public void setField15(String field15) {
-		this.field15 = field15;
-	}
-	public String getField16() {
-		return field16;
-	}
-	public void setField16(String field16) {
-		this.field16 = field16;
-	}
-	public String getField17() {
-		return field17;
-	}
-	public void setField17(String field17) {
-		this.field17 = field17;
-	}
-	public String getField18() {
-		return field18;
-	}
-	public void setField18(String field18) {
-		this.field18 = field18;
-	}
-	public String getField19() {
-		return field19;
-	}
-	public void setField19(String field19) {
-		this.field19 = field19;
-	}
-	public String getField20() {
-		return field20;
-	}
-	public void setField20(String field20) {
-		this.field20 = field20;
-	}
-	public String getField21() {
-		return field21;
-	}
-	public void setField21(String field21) {
-		this.field21 = field21;
-	}
-	public String getField22() {
-		return field22;
-	}
-	public void setField22(String field22) {
-		this.field22 = field22;
-	}
-	public String getField23() {
-		return field23;
-	}
-	public void setField23(String field23) {
-		this.field23 = field23;
-	}
-	public String getField24() {
-		return field24;
-	}
-	public void setField24(String field24) {
-		this.field24 = field24;
-	}
-	public String getField25() {
-		return field25;
-	}
-	public void setField25(String field25) {
-		this.field25 = field25;
-	}
-	public String getField26() {
-		return field26;
-	}
-	public void setField26(String field26) {
-		this.field26 = field26;
-	}
-	public String getField27() {
-		return field27;
-	}
-	public void setField27(String field27) {
-		this.field27 = field27;
-	}
-	public String getField28() {
-		return field28;
-	}
-	public void setField28(String field28) {
-		this.field28 = field28;
-	}
-	public String getField29() {
-		return field29;
-	}
-	public void setField29(String field29) {
-		this.field29 = field29;
-	}
+	private String srNo;
+	private String empIdNo;
+	private String occuranceNo;
+	private String loanFileNo;
+	private String loanAmount;
+	private String rateOfInterest;
+	private String tenure;
+	private String totalLoan;
+	private String emi;
+	private String otherLoans;
+	private String initials;
+	private String empName;
+	private String address;
+	private String city;
+	private String state;
+	private String zip;
+	private String country;
+	private String contactMode;
+	private String maritalStatus;
+	private String refName;
+	private String yearsOfEmployment;
+	private String designation;
+	private String department;
+	private String performance;
+	private String basicSalary;
+	private String centerName;
+	private String issuerBank;
+	private String healthId;
+	private String healthInsuranceProvider;
+	private String imageFileName;
 	
-	
-	
-
+	public String getImageFileName() {
+		return imageFileName;
+	}
+	public void setImageFileName(String imageFileName) {
+		this.imageFileName = imageFileName;
+	}
+	public String getSrNo() {
+		return srNo;
+	}
+	public void setSrNo(String srNo) {
+		this.srNo = srNo;
+	}
+	public String getEmpIdNo() {
+		return empIdNo;
+	}
+	public void setEmpIdNo(String empIdNo) {
+		this.empIdNo = empIdNo;
+	}
+	public String getOccuranceNo() {
+		return occuranceNo;
+	}
+	public void setOccuranceNo(String occuranceNo) {
+		this.occuranceNo = occuranceNo;
+	}
+	public String getLoanFileNo() {
+		return loanFileNo;
+	}
+	public void setLoanFileNo(String loanFileNo) {
+		this.loanFileNo = loanFileNo;
+	}
+	public String getLoanAmount() {
+		return loanAmount;
+	}
+	public void setLoanAmount(String loanAmount) {
+		this.loanAmount = loanAmount;
+	}
+	public String getRateOfInterest() {
+		return rateOfInterest;
+	}
+	public void setRateOfInterest(String rateOfInterest) {
+		this.rateOfInterest = rateOfInterest;
+	}
+	public String getTenure() {
+		return tenure;
+	}
+	public void setTenure(String tenure) {
+		this.tenure = tenure;
+	}
+	public String getTotalLoan() {
+		return totalLoan;
+	}
+	public void setTotalLoan(String totalLoan) {
+		this.totalLoan = totalLoan;
+	}
+	public String getEmi() {
+		return emi;
+	}
+	public void setEmi(String emi) {
+		this.emi = emi;
+	}
+	public String getOtherLoans() {
+		return otherLoans;
+	}
+	public void setOtherLoans(String otherLoans) {
+		this.otherLoans = otherLoans;
+	}
+	public String getInitials() {
+		return initials;
+	}
+	public void setInitials(String initials) {
+		this.initials = initials;
+	}
+	public String getEmpName() {
+		return empName;
+	}
+	public void setEmpName(String empName) {
+		this.empName = empName;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+	public String getZip() {
+		return zip;
+	}
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getContactMode() {
+		return contactMode;
+	}
+	public void setContactMode(String contactMode) {
+		this.contactMode = contactMode;
+	}
+	public String getMaritalStatus() {
+		return maritalStatus;
+	}
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
+	}
+	public String getRefName() {
+		return refName;
+	}
+	public void setRefName(String refName) {
+		this.refName = refName;
+	}
+	public String getYearsOfEmployment() {
+		return yearsOfEmployment;
+	}
+	public void setYearsOfEmployment(String yearsOfEmployment) {
+		this.yearsOfEmployment = yearsOfEmployment;
+	}
+	public String getDesignation() {
+		return designation;
+	}
+	public void setDesignation(String designation) {
+		this.designation = designation;
+	}
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+	public String getPerformance() {
+		return performance;
+	}
+	public void setPerformance(String performance) {
+		this.performance = performance;
+	}
+	public String getBasicSalary() {
+		return basicSalary;
+	}
+	public void setBasicSalary(String basicSalary) {
+		this.basicSalary = basicSalary;
+	}
+	public String getCenterName() {
+		return centerName;
+	}
+	public void setCenterName(String centerName) {
+		this.centerName = centerName;
+	}
+	public String getIssuerBank() {
+		return issuerBank;
+	}
+	public void setIssuerBank(String issuerBank) {
+		this.issuerBank = issuerBank;
+	}
+	public String getHealthId() {
+		return healthId;
+	}
+	public void setHealthId(String healthId) {
+		this.healthId = healthId;
+	}
+	public String getHealthInsuranceProvider() {
+		return healthInsuranceProvider;
+	}
+	public void setHealthInsuranceProvider(String healthInsuranceProvider) {
+		this.healthInsuranceProvider = healthInsuranceProvider;
+	}
 }
