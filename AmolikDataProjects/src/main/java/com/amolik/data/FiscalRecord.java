@@ -2,6 +2,7 @@ package com.amolik.data;
 
 public class FiscalRecord {
 	
+	private String imageFileName;
 	private String srNo;
 	private String empIdNo;
 	private String occuranceNo;
@@ -31,7 +32,7 @@ public class FiscalRecord {
 	private String issuerBank;
 	private String healthId;
 	private String healthInsuranceProvider;
-	private String imageFileName;
+	
 	
 	public String getImageFileName() {
 		return imageFileName;
