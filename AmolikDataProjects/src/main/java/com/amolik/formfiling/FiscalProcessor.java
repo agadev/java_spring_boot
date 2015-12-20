@@ -25,18 +25,20 @@ import com.amolik.util.*;
 
 public class FiscalProcessor {
 
+	
+
 	/**
 	 * Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(FiscalProcessor.class);
-	
+
 	/**
 	 *  Initializes property file.
 	 *  
 	 *  
 	 */
-	
-	 
+
+	Pattern spaceSlashSpacePattern = Pattern.compile(Constants.SPACE_FORWARD_SLASH_SPACE);
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -45,9 +47,12 @@ public class FiscalProcessor {
 		String fileSeparator=System.getProperty("file.separator");
 		String fileName=AmolikProperties.getProperty("fiscalprocessor.inputfileName");
 		String fullFileName=fileLoc+fileSeparator +fileName;
-		
+
+//		if (myString.matches("\\p{L}+")) { \\P{Letter}
+//		    return true;
+//		}
 		if(fileLoc==null){
-			
+
 			System.out.println("amolik.properties file not found, shutting down system");
 			System.exit(1);
 		}
@@ -55,7 +60,7 @@ public class FiscalProcessor {
 
 		long startTime=System.currentTimeMillis();
 		FiscalProcessor fiscalProcessor = new FiscalProcessor();
-		
+
 		fiscalProcessor.processDataFile(fullFileName); 
 
 		long endTime=System.currentTimeMillis();
@@ -71,7 +76,7 @@ public class FiscalProcessor {
 
 
 	public void processDataFile(String fullFileName) {
-		
+
 		int[] lineNum = { 0 };
 
 		List recordList = new ArrayList();
@@ -88,23 +93,30 @@ public class FiscalProcessor {
 				switch(lineNum[0]){
 
 				case 1:
+					if(logger.isInfoEnabled()){
+
+						logger.info("Processing record="+(recordList.size()+1));
+					}
 					setRecordFromLine1(line,record[0],fieldIndex[0]);
+					setFiscalRecordFromLine1(line,fiscalRecord);
 					break;
 				case 2:
-					setRecordFromLine2(line,record[0],fieldIndex[0]);
+					//setRecordFromLine2(line,record[0],fieldIndex[0]);
 					break;
 				case 3:
-					setRecordFromLine3(line,record[0],fieldIndex[0]);
+					//setRecordFromLine3(line,record[0],fieldIndex[0]);
 					break;
-				case 4:setRecordFromLine4(line,record[0],fieldIndex[0]);
+				case 4:
+					//setRecordFromLine4(line,record[0],fieldIndex[0]);
 				break;
-				case 5:setRecordFromLine5(line,record[0],fieldIndex[0]);
+				case 5:
+					//setRecordFromLine5(line,record[0],fieldIndex[0]);
 				break;
 				case 6:
-					setRecordFromLine6(line,record[0],fieldIndex[0]);
+					//setRecordFromLine6(line,record[0],fieldIndex[0]);
 					break;
 				case 7:
-					setRecordFromLine7(line,record[0],fieldIndex[0]);
+					//setRecordFromLine7(line,record[0],fieldIndex[0]);
 					// Add to list 
 					recordList.add(record[0]);
 
@@ -129,7 +141,7 @@ public class FiscalProcessor {
 		}
 	}
 
-	
+
 	public  void setRecordFromLine1(String firstLine,String[] record,int fieldIndex){
 
 		if (logger.isDebugEnabled()) {
@@ -168,7 +180,7 @@ public class FiscalProcessor {
 				if((splited[i]!=null) 
 						&& splited[i].charAt(0)==Constants.FORWARD_SLASH.charAt(0)){
 
-					fieldBuffer.append(splited[i-1]);
+					fieldBuffer.append(splited[i-1]+Constants.SPACE);
 					fieldIndex--;
 				}
 
@@ -177,7 +189,7 @@ public class FiscalProcessor {
 				// If '/' is last character then add next array field 
 				if(splited[i].indexOf(Constants.FORWARD_SLASH)== splited[i].length()-1){
 
-					fieldBuffer.append(splited[i+1]);
+					fieldBuffer.append(Constants.SPACE+splited[i+1]);
 					i++;
 				}
 
@@ -210,8 +222,8 @@ public class FiscalProcessor {
 		}
 	}
 
-	
-	public  void setFiscalRecordFromLine1(String firstLine,FiscalRecord record,int fieldIndex){
+
+	public  void setFiscalRecordFromLine1(String firstLine,FiscalRecord record){
 
 		if (logger.isDebugEnabled()) {
 
@@ -228,102 +240,112 @@ public class FiscalProcessor {
 			firstLine=firstLine.substring(1);
 		}
 
-		int lastIndexOfPercentage = extractMonthsFieldAndGetIndex(firstLine, record);
-		
+		int lastIndexOfPercentage = setMonthsFieldAndGetIndex(firstLine, record);
+
 		if(lastIndexOfPercentage >1) {
-			
-			firstLine= firstLine.substring(0, lastIndexOfPercentage);
+
+			firstLine= firstLine.substring(0, lastIndexOfPercentage+1);
 		}
-		
+
 		else {
-			
+
 			logger.error("% symbol not found in line|"+firstLine);
 		}
+
+
+	    int dollarIndex = firstLine.lastIndexOf("$");
+	    
+	    String[] amountPercentArray = firstLine.substring(dollarIndex).split("\\s+");
+	    
+	    if(logger.isDebugEnabled()){
+	    	
+	    	logger.debug("dollarSubstring="+firstLine.substring(dollarIndex));
+	    }
+	   
+	    if(amountPercentArray.length==2){
+	    	
+	    	record.setLoanAmount(amountPercentArray[0]);
+	    	record.setRateOfInterest(amountPercentArray[1]);
+	    	firstLine = firstLine.substring(0,dollarIndex);
+	    	if(logger.isDebugEnabled()){
+		    	
+		    	logger.debug("recordLoanAmount="+record.getLoanAmount()
+		    	           + "|RateOfInterest="+record.getRateOfInterest()
+		    	           +"|firstLine="+firstLine);
+		    }
+	    }
+	    
+		
+		String[] splited = firstLine.split("\\s+");
+		
+		StringBuffer loanFileNoBuffer = new StringBuffer();
+		for (int i=0;i<splited.length;i++) {
+
+
+				switch (i+1){
+				
+				 case 1: record.setSrNo(StringUtility.trim(splited[i]));
+					    break;
+				 case 2:record.setEmpIdNo(StringUtility.trim(splited[i]));
+					    break;
+				 case 3:record.setOccuranceNo(StringUtility.trim(splited[i]));
+					    break;
+					    
+				}
+		}	
 		
 		
-//		// Check if only one % symbol is present
-//		if(splited.length==2){
-//			
-//		}
-//		else if {
-//			
-//		}
-//		for (int i=0;i<splited.length;i++) {
-//
-//
-//			// If field does'nt contain '/' or '%' symbol just assign value
-//			if(!splited[i].contains(Constants.FORWARD_SLASH) 
-//					&& !splited[i].contains(Constants.PERCENT_SYMBOL)){
-//
-//				record[fieldIndex]=splited[i];
-//			}
-//
-//			// if contains '/' then process
-//			else if(splited[i].contains(Constants.FORWARD_SLASH)){
-//
-//				StringBuffer fieldBuffer= new StringBuffer(Constants.EMPTY_STRING);
-//				int indexOfSlash=0;
-//
-//				// If '/' is first character then add previous array field 
-//				if((splited[i]!=null) 
-//						&& splited[i].charAt(0)==Constants.FORWARD_SLASH.charAt(0)){
-//
-//					fieldBuffer.append(splited[i-1]);
-//					fieldIndex--;
-//				}
-//
-//				fieldBuffer.append(splited[i]);
-//
-//				// If '/' is last character then add next array field 
-//				if(splited[i].indexOf(Constants.FORWARD_SLASH)== splited[i].length()-1){
-//
-//					fieldBuffer.append(splited[i+1]);
-//					i++;
-//				}
-//
-//				record[fieldIndex]=fieldBuffer.toString().trim();
-//
-//
-//			}
-//
-//
-//			// if contains '%' then process
-//			else if (splited[i].contains(Constants.PERCENT_SYMBOL)){
-//
-//				record[fieldIndex]=splited[i];
-//				fieldIndex++;
-//				if (logger.isDebugEnabled()) {
-//					logger.debug("setRecordFromLine1(String, String[], int) - fieldIndex=" 
-//							+ fieldIndex); //$NON-NLS-1$
-//				}
-//				record[fieldIndex]=splited[i+1]+Constants.SPACE+splited[i+2];
-//				i=i+2;
-//			}
-//
-//			fieldIndex++;
-//		}
-//		printRecord(record, 0,fieldIndex);
-//
-//		if (logger.isDebugEnabled()) {
-//			logger.debug("setRecordFromLine1(String, String[], int) - fieldIndex="
-//					+ fieldIndex); //$NON-NLS-1$
-//		}
+			
+		    int startIndexOfOccuranceNo = firstLine.indexOf(record.getOccuranceNo());
+		    int endIndexOfOccuranceNo=startIndexOfOccuranceNo+record.getOccuranceNo().length();
+		    String loanFileNo = firstLine.substring(endIndexOfOccuranceNo+1);
+		    
+		    if(logger.isDebugEnabled()){
+		    	
+		    	logger.debug("loanFileNo="+loanFileNo);
+		    }
+		    if(loanFileNo!=null
+		    		&&!loanFileNo.equals(Constants.EMPTY_STRING)){
+		    	
+		    	Matcher m1 = spaceSlashSpacePattern.matcher(loanFileNo);
+		    	
+		    	if(!m1.matches()) {
+		    	
+		    		loanFileNo = loanFileNo.replaceAll("\\s+",Constants.EMPTY_STRING);
+		    		loanFileNo = loanFileNo.replaceAll(Constants.FORWARD_SLASH, 
+		    				               Constants.SPACE_FORWARD_SLASH_SPACE);
+		    	}
+		    }
+            record.setLoanFileNo(loanFileNo);
+            
+            if(logger.isInfoEnabled()){
+            	
+            	logger.info(record.getSrNo()
+            			+Constants.DOUBLE_PIPE+record.getEmpIdNo()
+            			+Constants.DOUBLE_PIPE+record.getOccuranceNo()
+            			+Constants.DOUBLE_PIPE+record.getLoanFileNo()
+            			+Constants.DOUBLE_PIPE+record.getLoanAmount()
+            			+Constants.DOUBLE_PIPE+record.getRateOfInterest()
+            			+Constants.DOUBLE_PIPE+record.getTenure()
+            			);
+            }
+			
 	}
 
 
-	public  int extractMonthsFieldAndGetIndex(String firstLine, FiscalRecord record) {
-		
+	public  int setMonthsFieldAndGetIndex(String firstLine, FiscalRecord record) {
+
 		int lastIndexOfPercentage = firstLine.lastIndexOf("%");
-		
+
 		if(lastIndexOfPercentage>0){
-			
-			String field7=firstLine.substring((lastIndexOfPercentage+1));
-			record.setField7(field7.trim());
+
+			String tenure=firstLine.substring((lastIndexOfPercentage+1));
+			record.setTenure(tenure.trim());
 			firstLine = firstLine.substring(0, lastIndexOfPercentage);
-			
+
 			if(logger.isDebugEnabled()){
-				
-				logger.debug("7th field="+field7.trim());
+
+				logger.debug("7th field="+tenure.trim());
 			}
 		}
 
@@ -393,44 +415,40 @@ public class FiscalProcessor {
 
 			logger.debug(thirdLine); //$NON-NLS-1$
 		}
+
+		String lastZipCodeNum = thirdLine.replaceAll("[^0-9]*$", "").replaceAll(".(?!$)", "");
+		int indexOfEndOfZipCode = thirdLine.lastIndexOf(lastZipCodeNum);
+		String country= thirdLine.substring(indexOfEndOfZipCode+1).trim();
+
+		thirdLine = thirdLine.substring(0, indexOfEndOfZipCode+1);
+
 		String[] splited = thirdLine.split("\\s+");
 
-		String country=Constants.EMPTY_STRING;
+		String regexZipcode = "^[0-9]{5}(?:-[0-9]{4})?$";
 		String state=null;
 		String city=null;
 		String address=Constants.EMPTY_STRING;
 
 
 		// Assume 2nd last field is zipcode
-		int zipCodeIdx=splited.length-2;
+		int zipCodeIdx=splited.length-1;
 		String zipCode=splited[zipCodeIdx];
 
 		//check if zipcode is numeric
-		if(zipCode.matches(".*\\d.*")){
+		if(zipCode.matches("\\d*")){
 
-			// If zipcode is numeric last array element should be country
-			country=splited[zipCodeIdx+1];
+			
+			state=splited[zipCodeIdx-1];
+			city=splited[zipCodeIdx-2];
+
+			for (int i=0;i<zipCodeIdx-2;i++) {
+
+				address= address+Constants.SPACE+splited[i];
+
+
+			}	
 
 		}
-		else {
-
-			// zipcode is not numeric, move back one index
-			zipCodeIdx--;
-			zipCode=splited[zipCodeIdx];
-
-			for(int j=zipCodeIdx+1;j<splited.length;j++)
-				country=country+" "+splited[j];
-		}
-
-		state=splited[zipCodeIdx-1];
-		city=splited[zipCodeIdx-2];
-
-		for (int i=0;i<zipCodeIdx-2;i++) {
-
-			address= address+Constants.SPACE+splited[i];
-
-
-		}	
 		record[fieldIndex]=address.trim();
 		fieldIndex++;
 
@@ -491,14 +509,14 @@ public class FiscalProcessor {
 				}
 
 				if (logger.isDebugEnabled()) {
-					
+
 					logger.debug("setRecordFromLine4(String, String[], int) - nameBuffer="); //$NON-NLS-1$
 				}
 				record[fieldIndex]=nameBuffer.toString().trim();
 
 				fieldIndex++;
 
-				// Assign experience field
+				// Assign experience field in years
 				record[fieldIndex]=splited[i-1]+Constants.SPACE+splited[i];
 
 				// from index 2 to current index, add to string
@@ -531,7 +549,7 @@ public class FiscalProcessor {
 		int yearsIndex=0;
 		String amt="";
 		if (logger.isDebugEnabled()) {
-			
+
 			logger.debug(fifthLine); //$NON-NLS-1$
 		}
 		StringBuffer officeBuffer = new StringBuffer();
@@ -617,7 +635,7 @@ public class FiscalProcessor {
 		}
 
 		if (logger.isDebugEnabled()) {
-			
+
 			logger.debug("setRecordFromLine6(String, String[], int) - healthPlanBuffer=" 
 					+ healthPlanBuffer.toString().trim()); //$NON-NLS-1$
 		}
