@@ -18,4 +18,5 @@ public class Constants {
 	public static final String PERCENT_SYMBOL = "%";
 	public static final String FORWARD_SLASH = "/";
 	public static final String SPACE=" ";
+	public static final String SPACE_FORWARD_SLASH_SPACE = SPACE+FORWARD_SLASH+SPACE;
 }
