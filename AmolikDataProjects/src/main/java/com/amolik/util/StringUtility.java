@@ -18,15 +18,26 @@ public class StringUtility {
 
 		return false;
 	}
-	
+
 	public static String getLowerCaseString(String column){
-		
-		
+
+
 		if(column!=null && !column.equals(Constants.SPACE_0)) {
 
 			column=column.toLowerCase(Locale.ROOT).trim();
 		}
-		
+
 		return column;
+	}
+
+	public static String trim(String s){
+
+		if(s != null||!s.equals("null")) {
+
+			s = s.trim();
+		}
+
+		return s;
+
 	}
 }
