@@ -40,4 +40,28 @@ public class StringUtility {
 		return s;
 
 	}
+
+	public static int getLastRecordFromFileName(String fileName,int folderSize){
+
+
+		Matcher matcher = Pattern.compile("_[0-9]+").matcher(fileName);
+		int folderCount=0;
+		if (matcher.find()) {
+					
+			//System.out.println("matcher="+matcher.group());
+			folderCount = Integer.valueOf(matcher.group().replace("_", ""));
+		}
+		
+		if(folderCount>0){
+			folderCount--;
+		}
+		return folderCount*folderSize;
+	}
+
+	public static String getFileNameBeforeUnderScore(String fileName){
+
+		int indexOfUnderscore = fileName.indexOf("_");
+		String baseFile= fileName.substring(0,indexOfUnderscore);
+		return baseFile;
+	}
 }
