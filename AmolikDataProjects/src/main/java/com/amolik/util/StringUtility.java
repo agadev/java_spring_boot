@@ -1,5 +1,6 @@
 package com.amolik.util;
 
+import java.text.Normalizer;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,6 +8,8 @@ import java.util.regex.Pattern;
 public class StringUtility {
 
 	public static final Pattern HINDI_CHARACTERS = Pattern.compile("[\u0900-\u097F]+");
+	public static final Pattern removeDiacriticalMarksPattern = 
+			Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
 	public static boolean isHindi(String compareString){
 
@@ -47,11 +50,11 @@ public class StringUtility {
 		Matcher matcher = Pattern.compile("_[0-9]+").matcher(fileName);
 		int folderCount=0;
 		if (matcher.find()) {
-					
+
 			//System.out.println("matcher="+matcher.group());
 			folderCount = Integer.valueOf(matcher.group().replace("_", ""));
 		}
-		
+
 		if(folderCount>0){
 			folderCount--;
 		}
@@ -63,5 +66,17 @@ public class StringUtility {
 		int indexOfUnderscore = fileName.indexOf("_");
 		String baseFile= fileName.substring(0,indexOfUnderscore);
 		return baseFile;
+	}
+
+	public static String getDeAccentedString(String str) {
+
+		if(str!=null && !str.equals("")) {
+
+			String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
+
+			return removeDiacriticalMarksPattern.matcher(nfdNormalizedString).replaceAll("");
+		}
+
+		return str;
 	}
 }
