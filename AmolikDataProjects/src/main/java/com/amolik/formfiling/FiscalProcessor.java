@@ -88,7 +88,7 @@ public class FiscalProcessor {
 
 			String baseFile= StringUtility.getFileNameBeforeUnderScore(
 					fileName)+"img";
-			
+
 			int[] baseRecordCount = {StringUtility.getLastRecordFromFileName(fileName, 200)};
 
 			stream.forEach((line)->{
@@ -98,11 +98,11 @@ public class FiscalProcessor {
 				switch(lineNum[0]){
 
 				case 1:
-					if(logger.isInfoEnabled()){
-
-						logger.info("Processing record="+(recordList.size()+1)
-								+"|file="+imgFileName);
-					}
+					//					if(logger.isInfoEnabled()){
+					//
+					//						logger.info("Processing record="+(recordList.size()+1)
+					//								+"|file="+imgFileName);
+					//					}
 
 					setFiscalRecordFromLine1(line,fiscalRecord);
 					break;
@@ -132,6 +132,10 @@ public class FiscalProcessor {
 
 						logger.debug(fiscalRecord.getIssuerBank());
 					}
+
+					fixNumericFields(fiscalRecord);
+					fixYearsOfEmployment(fiscalRecord);
+					printFiscalRecord(fiscalRecord);
 					// Add to list 
 					recordList.add(fiscalRecord);
 
@@ -255,9 +259,9 @@ public class FiscalProcessor {
 		}
 		record.setLoanFileNo(loanFileNo);
 
-		if(logger.isInfoEnabled()){
+		if(logger.isDebugEnabled()){
 
-			logger.info(record.getSrNo()
+			logger.debug(record.getSrNo()
 					+Constants.DOUBLE_PIPE+record.getEmpIdNo()
 					+Constants.DOUBLE_PIPE+record.getOccuranceNo()
 					+Constants.DOUBLE_PIPE+record.getLoanFileNo()
@@ -327,9 +331,9 @@ public class FiscalProcessor {
 		record.setEmpName(StringUtility.trim(
 				secondLine.substring(endIndexOfOccuranceNo+1)));
 
-		if(logger.isInfoEnabled()){
+		if(logger.isDebugEnabled()){
 
-			logger.info(record.getTotalLoan()
+			logger.debug(record.getTotalLoan()
 					+Constants.DOUBLE_PIPE+record.getEmi()
 					+Constants.DOUBLE_PIPE+record.getOtherLoans()
 					+Constants.DOUBLE_PIPE+record.getInitials()
@@ -361,10 +365,6 @@ public class FiscalProcessor {
 
 			logger.debug("line before getting zipcode ="+thirdLine );
 		}
-
-		//		String state=null;
-		//		String city=null;
-		//		String address=Constants.EMPTY_STRING;
 
 
 		// Assume 2nd last field is zipcode
@@ -441,9 +441,9 @@ public class FiscalProcessor {
 			logger.error("valid suffix not found|"+thirdLine);
 		}
 
-		if (logger.isInfoEnabled()){
+		if (logger.isDebugEnabled()){
 
-			logger.info(record.getAddress()
+			logger.debug(record.getAddress()
 					+Constants.DOUBLE_PIPE+record.getCity()
 					+Constants.DOUBLE_PIPE+record.getState()
 					+Constants.DOUBLE_PIPE+record.getZip()
@@ -477,7 +477,7 @@ public class FiscalProcessor {
 				break;	
 
 			case 3:
-				//record.setRefName(StringUtility.trim(splited[i]));
+
 				fourthLine = StringUtility.trim(splited[i]);
 				break;
 
@@ -493,12 +493,10 @@ public class FiscalProcessor {
 
 			case 1:
 				yearsContainingString=StringUtility.trim(splited[i]);
-				//System.out.println(StringUtility.trim(splited[i]));
 				break;
 
 			case 2:
 				yearsAfterString = StringUtility.trim(splited[i]);
-				//System.out.println(yearsAfterString);
 				break;	
 
 			}
@@ -506,8 +504,6 @@ public class FiscalProcessor {
 
 		splited = oneOrMoreSpacePattern.split(yearsAfterString);
 
-		String department="";
-		String position="";
 		for (int i=0;i<splited.length;i++){
 
 			switch (i+1){
@@ -581,12 +577,10 @@ public class FiscalProcessor {
 		}
 
 		record.setRefName(refNameBuffer.toString());
-		record.setYearsOfEmployment(
-				record.getYearsOfEmployment().replaceAll("[L,l]|[I,i]", "1"));
 
-		if (logger.isInfoEnabled()){
+		if (logger.isDebugEnabled()){
 
-			logger.info(record.getContactMode()
+			logger.debug(record.getContactMode()
 					+Constants.DOUBLE_PIPE+record.getMaritalStatus()
 					+Constants.DOUBLE_PIPE+record.getRefName()
 					+Constants.DOUBLE_PIPE+record.getYearsOfEmployment()
@@ -596,8 +590,6 @@ public class FiscalProcessor {
 		}
 
 	}
-
-
 
 	public  void setFiscalRecordFromLine5(String fifthLine,FiscalRecord record){
 
@@ -629,12 +621,9 @@ public class FiscalProcessor {
 				}
 			}
 
+		if(logger.isDebugEnabled()){
 
-
-
-		if(logger.isInfoEnabled()){
-
-			logger.info(record.getPerformance()
+			logger.debug(record.getPerformance()
 					+Constants.DOUBLE_PIPE+record.getBasicSalary()
 					+Constants.DOUBLE_PIPE+record.getCenterName()
 					);
@@ -667,22 +656,126 @@ public class FiscalProcessor {
 				}
 			}
 
-		if(logger.isInfoEnabled()) {
+		if(logger.isDebugEnabled()) {
 
-			logger.info(record.getHealthId()
+			logger.debug(record.getHealthId()
 					+Constants.DOUBLE_PIPE+record.getHealthInsuranceProvider());
 		}
 	}
 
-	public String fixNonNumericChar(String field){
+	// replace ocr mistakes
+	public void fixNumericFields(FiscalRecord record){
+
+
+		record.setBasicSalary(fixNonNumericCharInNumericField(record.getBasicSalary()));
+		record.setEmi(fixNonNumericCharInNumericField(record.getEmi()));
+		record.setLoanAmount(fixNonNumericCharInNumericField(record.getLoanAmount()));
+		record.setOccuranceNo(fixNonNumericCharInNumericField(record.getOccuranceNo()));
+		record.setRateOfInterest(fixNonNumericCharInNumericField(record.getRateOfInterest()));
+		record.setTotalLoan(fixNonNumericCharInNumericField(record.getTotalLoan()));
+		record.setZip(fixNonNumericCharInNumericField(record.getZip()));
+
+	}
+
+
+	public String fixNonNumericCharInNumericField(String field){
+
+			field= StringUtility.getDeAccentedString(field);
+			field=field.replaceAll("[I,i,L,l]", "1")
+					.replaceAll("[O,o]", "0")
+					.replaceAll("[S,s]", "5")
+					.replaceAll("[Z,z]", "2")
+					;
+		
+
+		return field;
+	}
+
+	public void fixYearsOfEmployment(FiscalRecord record) {
+
+		record.setYearsOfEmployment(
+				record.getYearsOfEmployment()
+				.replaceAll("[L,l]|[I,i]", "1")
+				);
+	}
+
+	public void fixNonNumericFields(FiscalRecord record){
+
+
+		record.setOtherLoans(fixNumericInNonNumericField(record.getOtherLoans()));
+		record.setInitials(fixNumericInNonNumericField(record.getInitials()));
+		record.setEmpName(fixNumericInNonNumericField(record.getEmpName()));
+		record.setCity(fixNumericInNonNumericField(record.getCity()));
+		record.setState(fixNumericInNonNumericField(record.getState()));
+		record.setCountry(fixNumericInNonNumericField(record.getCountry()));
+		record.setContactMode(fixNumericInNonNumericField(record.getContactMode()));
+		record.setMaritalStatus(fixNumericInNonNumericField(record.getMaritalStatus()));
+		record.setRefName(fixNumericInNonNumericField(record.getRefName()));
+		record.setDesignation(fixNumericInNonNumericField(record.getDesignation()));
+		record.setDepartment(fixNumericInNonNumericField(record.getDepartment()));
+		record.setRefName(fixNumericInNonNumericField(record.getRefName()));
+		record.setIssuerBank(fixNumericInNonNumericField(record.getIssuerBank()));
+
+	}
+
+	public String fixNumericInNonNumericField(String field){
 
 
 		if(field!=null && field.trim().equals(Constants.EMPTY_STRING)) {
 
-			field=field.replaceAll("[I,i,L,l]", "1").replaceAll("[O,o]", "0").replaceAll("[S,s]", "5");
+			field=field.replaceAll("[2]", "Z")
+					.replaceAll("[0]", "O")
+					.replaceAll("[5]", "S")
+					.replaceAll("[1]","l")
+					;
 		}
 
 		return field;
+	}
+
+	public void printFiscalRecord(FiscalRecord record){
+
+		if(logger.isInfoEnabled()){
+
+			logger.info(record.getSrNo()
+					+Constants.DOUBLE_PIPE+record.getEmpIdNo()
+					+Constants.DOUBLE_PIPE+record.getOccuranceNo()
+					+Constants.DOUBLE_PIPE+record.getLoanFileNo()
+					+Constants.DOUBLE_PIPE+record.getLoanAmount()
+					+Constants.DOUBLE_PIPE+record.getRateOfInterest()
+					+Constants.DOUBLE_PIPE+record.getTenure()
+					);
+			logger.info(record.getTotalLoan()
+					+Constants.DOUBLE_PIPE+record.getEmi()
+					+Constants.DOUBLE_PIPE+record.getOtherLoans()
+					+Constants.DOUBLE_PIPE+record.getInitials()
+					+Constants.DOUBLE_PIPE+record.getEmpName()
+					);
+
+			logger.info(record.getAddress()
+					+Constants.DOUBLE_PIPE+record.getCity()
+					+Constants.DOUBLE_PIPE+record.getState()
+					+Constants.DOUBLE_PIPE+record.getZip()
+					+Constants.DOUBLE_PIPE+record.getCountry()
+					);
+
+			logger.info(record.getContactMode()
+					+Constants.DOUBLE_PIPE+record.getMaritalStatus()
+					+Constants.DOUBLE_PIPE+record.getRefName()
+					+Constants.DOUBLE_PIPE+record.getYearsOfEmployment()
+					+Constants.DOUBLE_PIPE+record.getDesignation()
+					+Constants.DOUBLE_PIPE+record.getDepartment()
+					);
+
+			logger.info(record.getPerformance()
+					+Constants.DOUBLE_PIPE+record.getBasicSalary()
+					+Constants.DOUBLE_PIPE+record.getCenterName()
+					+Constants.DOUBLE_PIPE+record.getIssuerBank()
+					);
+
+			logger.info(record.getHealthId()
+					+Constants.DOUBLE_PIPE+record.getHealthInsuranceProvider());
+		}
 	}
 }
 
