@@ -18,6 +18,7 @@ public class Constants {
 	public static final String PERCENT_SYMBOL = "%";
 	public static final String FORWARD_SLASH = "/";
 	public static final String SPACE=" ";
+	public static final String NULL_STRING="null";
 	public static final String SPACE_FORWARD_SLASH_SPACE = SPACE+FORWARD_SLASH+SPACE;
 	public static final String MONTHS_OR_YEAR_PATTERN_STRING = "[Y,y][E,e][A,a][R,r][S,s]?|[M,m][O,o,0][N,n][T,t][H,h][S,s]?";
 	public static final String ONE_OR_MORE_SPACE_STRING = "\\s+";
