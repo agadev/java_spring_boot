@@ -51,7 +51,6 @@ public class StringUtility {
 		int folderCount=0;
 		if (matcher.find()) {
 
-			//System.out.println("matcher="+matcher.group());
 			folderCount = Integer.valueOf(matcher.group().replace("_", ""));
 		}
 
@@ -61,6 +60,11 @@ public class StringUtility {
 		return folderCount*folderSize;
 	}
 
+	public static String getFileNameWithoutExtension(String fileName){
+
+		return fileName.replaceFirst("[.][^.]+$", "");
+	}
+	
 	public static String getFileNameBeforeUnderScore(String fileName){
 
 		int indexOfUnderscore = fileName.indexOf("_");
