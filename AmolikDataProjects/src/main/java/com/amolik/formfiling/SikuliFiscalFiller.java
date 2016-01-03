@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.log4j.Logger;
+import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 
 import com.amolik.util.AmolikProperties;
@@ -47,6 +48,13 @@ public class SikuliFiscalFiller {
 		extractProperties();
 		Screen s = new Screen();
 
+		// Turn off sikuli loggind
+		Settings.ActionLogs=false;
+		Settings.InfoLogs=false;
+		Settings.DebugLogs=false;
+		Settings.MoveMouseDelay=(float) 0.1;
+		
+		
 		ImagePath.add(imageDir);
 		try{
 
