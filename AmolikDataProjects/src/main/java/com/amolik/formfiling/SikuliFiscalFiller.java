@@ -35,23 +35,55 @@ public class SikuliFiscalFiller {
 	private static float waitTimeAfterTypingRecordImagePath;
 	private static String inputDataImageDir;
 	private static String inputFileDelimiter;
+	private static int lastRecordProcessed;
 
 	public static void main(String[] args) {
 
+		long startTime=System.currentTimeMillis();
+		if(logger.isInfoEnabled()) {
+
+			logger.info("Starting Sikuli form filling process");
+		}
 		extractProperties();
 		Screen s = new Screen();
-		String recordImagePath = "C:\\Debtor2910\\FPDATA1110_8\\FPDATA1110img1415.jpeg";
+
 		ImagePath.add(imageDir);
 		try{
 
 			openDebtorApplication(s);
 			setDebtorApplicationDatabase(s);
 
+			if(logger.isInfoEnabled()){
+
+				logger.info("Loaded database in "+(
+						System.currentTimeMillis()-startTime)+" ms");
+			}
+			startTime=System.currentTimeMillis();
 			try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputDataFile))) {
 				String line = null;
+
+				// if last directory is full loaded reset count to zero
+				if(lastRecordProcessed==200){
+
+					lastRecordProcessed=0;
+				}
+
+				int currentRecord=1;
 				while ((line = reader.readLine()) != null) {	
 
-					fillDebtorApplicationImage(s, line);
+					if(currentRecord>lastRecordProcessed){
+
+						fillDebtorApplicationFromImage(s, line,currentRecord);
+
+						if(logger.isInfoEnabled()){
+
+							logger.info("finished filling record |"+currentRecord+"|"
+									+((System.currentTimeMillis()-startTime)/1000)+" seconds");
+						}
+					}
+					currentRecord++;
+
+
 				}
 			}
 		} catch (IOException e) {
@@ -63,11 +95,11 @@ public class SikuliFiscalFiller {
 		}
 	}
 
-	public static void fillDebtorApplicationImage(Screen s, String line) 
+	public static void fillDebtorApplicationFromImage(Screen s, String line,int currentRecord) 
 			throws FindFailed {
 
 		if(logger.isInfoEnabled()){
-			
+
 			logger.info(line);
 		}
 		String[] splited = line.split(inputFileDelimiter);
@@ -77,13 +109,27 @@ public class SikuliFiscalFiller {
 
 			if(i==0){
 				String inputDataImagePath= inputDataImageDir+fileSeparator+splited[i];
-				
-				
+
+
 				setDebtorApplicationRecordImage(s, inputDataImagePath);
 			}
 			else {
 
-				s.type(splited[i]);
+				try {
+					String field= splited[i];
+
+					// Trim if greater than 45
+					if(field.length()>45){
+
+						field = field.substring(0,44).substring(0, 
+								field.lastIndexOf(" "));
+					}
+					s.type(field);
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				}
 
 				if(i<splited.length-1){
 
@@ -92,6 +138,10 @@ public class SikuliFiscalFiller {
 			}
 
 		}
+		s.type("s",KeyModifier.CTRL);
+		AmolikProperties.setProperty("sikuliFiller.lastRecordProcessed",
+				Integer.toString(currentRecord));
+		AmolikProperties.saveProperties();
 
 	}
 
@@ -102,7 +152,7 @@ public class SikuliFiscalFiller {
 		s.type("i", KeyModifier.CTRL);
 		s.click(new Pattern(fileNameImage).targetOffset(fileNameImageOffsetX,fileNameImageOffsetY));
 		s.wait(waitTimeBeforeTypingRecordImagePath);
-		s.type(recordImagePath);
+		s.paste(recordImagePath);
 		s.type(Key.ENTER);
 		s.wait(waitTimeAfterTypingRecordImagePath);
 		s.click(new Pattern(srNoImage).targetOffset(srNoImageOffsetX,srNoImageOffsetY));
@@ -116,7 +166,7 @@ public class SikuliFiscalFiller {
 				.targetOffset(fileNameImageOffsetX,fileNameImageOffsetY));
 
 		s.wait(waitTimeBeforeTypingDebtorDatabasePath);
-		s.type(debtorDatabasePath);
+		s.paste(debtorDatabasePath);
 		s.type(Key.ENTER);
 		s.wait(waitTimeAfterTypingDebtorDatabasePath);
 	}
@@ -191,8 +241,11 @@ public class SikuliFiscalFiller {
 		inputDataImageDir = AmolikProperties.getProperty("sikuliFiller.inputDataImageBaseDir")
 				+fileSeparator
 				+AmolikProperties.getProperty("sikuliFiller.inputDatafileName");
-		
+
 		inputFileDelimiter = AmolikProperties.getProperty("sikuliFiller.inputFileDelimiter");
+
+		lastRecordProcessed = new Integer(
+				AmolikProperties.getProperty("sikuliFiller.lastRecordProcessed"));
 
 		if(logger.isDebugEnabled()){
 
