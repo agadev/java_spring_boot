@@ -1,6 +1,7 @@
 package com.amolik.formfiling;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,16 +44,27 @@ public class FiscalProcessor {
 
 	Pattern spaceSlashSpacePattern = Pattern.compile(Constants.SPACE_FORWARD_SLASH_SPACE);
 
+
+
+	private static String inputFileDir;
+
+	private static String fileSeparator;
+
+	private static String inputFileName;
+
+	private static String outputFileDelimiter;
+
+	private static String inputFileFullName;
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		String fileLoc=AmolikProperties.getProperty("fiscalprocessor.inputFileDir");
-		String fileSeparator=System.getProperty("file.separator");
-		String fileName=AmolikProperties.getProperty("fiscalprocessor.inputfileName");
-		String fullFileName=fileLoc+fileSeparator +fileName;
+		FiscalProcessor fiscalProcessor = new FiscalProcessor();
+		fiscalProcessor.initializeFromPropertyFile();
+		List<FiscalRecord> recordList = new ArrayList<FiscalRecord>();
 
 
-		if(fileLoc==null){
+		if(fiscalProcessor.inputFileDir==null){
 
 			System.out.println("amolik.properties file not found, shutting down system");
 			System.exit(1);
@@ -60,9 +72,14 @@ public class FiscalProcessor {
 
 
 		long startTime=System.currentTimeMillis();
-		FiscalProcessor fiscalProcessor = new FiscalProcessor();
 
-		fiscalProcessor.processDataFile(fullFileName,fileName); 
+
+		fiscalProcessor.processDataFile(inputFileFullName,
+				inputFileName,recordList); 
+
+		fiscalProcessor.writeDelimitedRecordsToFile(
+				StringUtility.getFileNameWithoutExtension(inputFileName)
+				,outputFileDelimiter,recordList);
 
 		long endTime=System.currentTimeMillis();
 		long timeTaken=endTime-startTime;
@@ -76,35 +93,108 @@ public class FiscalProcessor {
 	}
 
 
-	public void processDataFile(String fullFileName,String fileName) {
+	public void initializeFromPropertyFile() {
+
+		inputFileDir = AmolikProperties.getProperty("fiscalprocessor.inputFileDir");
+		fileSeparator = System.getProperty("file.separator");
+		inputFileName = AmolikProperties.getProperty("fiscalprocessor.inputfileName");
+		outputFileDelimiter = AmolikProperties.getProperty("fiscalprocessor.outputFileDelimiter");
+		inputFileFullName = inputFileDir+fileSeparator +inputFileName;
+	}
+
+
+	private void writeDelimitedRecordsToFile(String outFileNameWithoutExt,
+			String outputFileDelimiter,List<FiscalRecord> recordList) {
+
+		String outputFilePath = inputFileDir
+				+fileSeparator+outFileNameWithoutExt;
+
+		if(logger.isInfoEnabled()){
+
+			logger.info("Writing record to file="+outputFilePath);
+		}
+		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFilePath))) {
+
+			for (FiscalRecord record : recordList) {
+				// System.out.println(name);
+				writer.write(record.getImageFileName()
+						+outputFileDelimiter+record.getSrNo()
+						+outputFileDelimiter+record.getEmpIdNo()
+						+outputFileDelimiter+record.getOccuranceNo()
+						+outputFileDelimiter+record.getLoanFileNo()
+						+outputFileDelimiter+record.getLoanAmount()
+						+outputFileDelimiter+record.getRateOfInterest()
+						+outputFileDelimiter+record.getTenure()
+						+outputFileDelimiter+record.getTotalLoan()
+						+outputFileDelimiter+record.getEmi()
+						+outputFileDelimiter+record.getOtherLoans()
+						+outputFileDelimiter+record.getInitials()
+						+outputFileDelimiter+record.getEmpName()
+						+outputFileDelimiter+record.getAddress()
+						+outputFileDelimiter+record.getCity()
+						+outputFileDelimiter+record.getState()
+						+outputFileDelimiter+record.getZip()
+						+outputFileDelimiter+record.getCountry()
+						+outputFileDelimiter+record.getContactMode()
+						+outputFileDelimiter+record.getMaritalStatus()
+						+outputFileDelimiter+record.getRefName()
+						+outputFileDelimiter+record.getYearsOfEmployment()
+						+outputFileDelimiter+record.getDesignation()
+						+outputFileDelimiter+record.getDepartment()
+						+outputFileDelimiter+record.getPerformance()
+						+outputFileDelimiter+record.getBasicSalary()
+						+outputFileDelimiter+record.getCenterName()
+						+outputFileDelimiter+record.getIssuerBank()
+						+outputFileDelimiter+record.getHealthId()
+						+outputFileDelimiter+record.getHealthInsuranceProvider()
+						+"\n"
+						);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		 
+	}
+
+
+	public void processDataFile(String fullFileName,String fileName,List<FiscalRecord> recordList) {
+
+
+		if(logger.isInfoEnabled()){
+
+			logger.info("Processing input file ="+fullFileName);
+		}
 
 		int[] lineNum = { 0 };
 
-		List recordList = new ArrayList();
-		//String[][] record = new String[1][29];
-		FiscalRecord fiscalRecord = new FiscalRecord();
+		//try (Stream<String> stream = Files.lines(Paths.get(fullFileName))) {
 
-		try (Stream<String> stream = Files.lines(Paths.get(fullFileName))) {
+		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fullFileName))) {
 
 			String baseFile= StringUtility.getFileNameBeforeUnderScore(
 					fileName)+"img";
 
 			int[] baseRecordCount = {StringUtility.getLastRecordFromFileName(fileName, 200)};
+			FiscalRecord fiscalRecord = new FiscalRecord();
+			String line = null;
+			while ((line = reader.readLine()) != null) {
 
-			stream.forEach((line)->{
+				//stream.forEach((line)->{
+
 				lineNum[0]++;
 				String imgFileName = baseFile+(baseRecordCount[0]+recordList.size()+1)+".jpeg";
 				fiscalRecord.setImageFileName(imgFileName);
 				switch(lineNum[0]){
 
 				case 1:
-					//					if(logger.isInfoEnabled()){
-					//
-					//						logger.info("Processing record="+(recordList.size()+1)
-					//								+"|file="+imgFileName);
-					//					}
+					if(logger.isInfoEnabled()){
+
+						logger.info("Processing record="+(recordList.size()+1)
+								+"|file="+imgFileName);
+					}
 
 					setFiscalRecordFromLine1(line,fiscalRecord);
+
 					break;
 				case 2:
 
@@ -128,17 +218,21 @@ public class FiscalProcessor {
 					break;
 				case 7:
 					fiscalRecord.setIssuerBank(StringUtility.trim(line));
+
 					if(logger.isDebugEnabled()) {
 
 						logger.debug(fiscalRecord.getIssuerBank());
 					}
 
+					printFiscalRecord(fiscalRecord);
 					fixNumericFields(fiscalRecord);
+					fixNonNumericFields(fiscalRecord);
 					fixYearsOfEmployment(fiscalRecord);
+					fixRefName(fiscalRecord);
 					printFiscalRecord(fiscalRecord);
 					// Add to list 
 					recordList.add(fiscalRecord);
-
+					fiscalRecord = new FiscalRecord();
 					// Reset to new record
 					lineNum[0]=0;
 
@@ -149,8 +243,7 @@ public class FiscalProcessor {
 					}
 					break;
 				}
-			});
-			stream.close();
+			}
 		} catch (IOException ex) {
 			// do something with exception
 			logger.error("main(String[])", ex); //$NON-NLS-1$
@@ -160,7 +253,7 @@ public class FiscalProcessor {
 
 
 
-	public  void setFiscalRecordFromLine1(String firstLine,FiscalRecord record){
+	public  FiscalRecord setFiscalRecordFromLine1(String firstLine,FiscalRecord record){
 
 		if (logger.isDebugEnabled()) {
 
@@ -224,7 +317,7 @@ public class FiscalProcessor {
 
 			case 1: record.setSrNo(StringUtility.trim(splited[i]));
 			break;
-			case 2:record.setEmpIdNo(StringUtility.trim(splited[i]));
+			case 2: record.setEmpIdNo(StringUtility.trim(splited[i]));
 			break;
 			case 3:record.setOccuranceNo(StringUtility.trim(splited[i]));
 			break;
@@ -252,7 +345,7 @@ public class FiscalProcessor {
 				loanFileNo = loanFileNo.replaceAll(Constants.ONE_OR_MORE_SPACE_STRING,
 						Constants.EMPTY_STRING);
 
-				//loanFileNo = loanFileNo.replace(Constants.FORWARD_SLASH, 
+
 				loanFileNo = loanFileNo.replaceAll("[^A-Za-z0-9]", 
 						Constants.SPACE_FORWARD_SLASH_SPACE);
 			}
@@ -271,6 +364,7 @@ public class FiscalProcessor {
 					);
 		}
 
+		return record;
 	}
 
 
@@ -680,23 +774,60 @@ public class FiscalProcessor {
 
 	public String fixNonNumericCharInNumericField(String field){
 
+		if(field!=null
+				&&!field.equals(Constants.EMPTY_STRING)) {
+
 			field= StringUtility.getDeAccentedString(field);
-			field=field.replaceAll("[I,i,L,l]", "1")
-					.replaceAll("[O,o]", "0")
-					.replaceAll("[S,s]", "5")
-					.replaceAll("[Z,z]", "2")
+			field=field.replaceAll("(?i)L|(?i)I", "1")
+					.replaceAll("(?i)o", "0")
+					.replaceAll("(?i)s", "5")
+					.replaceAll("(?i)z", "2")
 					;
-		
+		}
 
 		return field;
 	}
 
 	public void fixYearsOfEmployment(FiscalRecord record) {
 
-		record.setYearsOfEmployment(
-				record.getYearsOfEmployment()
-				.replaceAll("[L,l]|[I,i]", "1")
-				);
+		String field = record.getYearsOfEmployment();
+
+		if(field!=null
+				&&!field.equals(Constants.EMPTY_STRING)) {
+
+			record.setYearsOfEmployment(
+					record.getYearsOfEmployment()
+					.replaceAll("(?i)L|(?i)I", "1")
+					);
+		}
+	}
+
+	public void fixRefName(FiscalRecord record) {
+
+		String field = record.getRefName();
+
+		if(field!=null
+				&&!field.equals(Constants.EMPTY_STRING)) {
+
+			record.setRefName(
+					record.getRefName()
+					.replaceAll("\\.", "_")
+					);
+		}
+	}
+
+	public void fixLoanFileNo(FiscalRecord record) {
+
+		String field = record.getLoanFileNo();
+
+		if(field!=null
+				&&!field.equals(Constants.EMPTY_STRING)) {
+
+			if(record.getLoanFileNo().indexOf(" / ") < 7 ){
+				record.setLoanFileNo(record.getLoanFileNo().replaceFirst(" / ", "Ï"));
+			}
+		}
+
 	}
 
 	public void fixNonNumericFields(FiscalRecord record){
