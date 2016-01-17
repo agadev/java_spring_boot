@@ -2,6 +2,7 @@ package com.amolik.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -23,12 +24,12 @@ public class FileUtility {
 	int maxHeightWd  =0;
 	String maxWidthFilename="";
 	String maxHeightFilename="";
-	
-	
+
+
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		String baseDir = "E:\\Automation\\KOMAL\\FISCAL\\RAW_DATA";
+		String baseDir = "E:\\Automation\\KOMAL\\FISCAL\\RAW_DATA\\RUPESH\\";
 		//findMaxWidthImage(baseDir);
 		//findMaxWidthImageUsingNio(Paths.get(baseDir));
 		FileUtility fileUtil = new FileUtility();
@@ -43,49 +44,51 @@ public class FileUtility {
 	}
 
 
-	
+
 	public List<Path> getRecursiveFileList(Path path) throws IOException {
-		
-	    Deque<Path> stack = new ArrayDeque<Path>();
-	    final List<Path> files = new LinkedList<>();
 
-	    stack.push(path);
+		Deque<Path> stack = new ArrayDeque<Path>();
+		final List<Path> files = new LinkedList<>();
 
-	    while (!stack.isEmpty()) {
-	        DirectoryStream<Path> stream = Files.newDirectoryStream(stack.pop());
-	        for (Path entry : stream) {
-	            if (Files.isDirectory(entry)) {
-	                stack.push(entry);
-	            }
-	            else {
-	            	
-	            	File file = entry.toFile();
-	                files.add(entry);
-	                System.out.println(entry);
-	                BufferedImage bimg = ImageIO.read(file);
-					//System.out.println(file.getName());
-					if(maxWidth<bimg.getWidth()){
+		stack.push(path);
 
-						maxWidth        = bimg.getWidth();
-						maxWidthHt         = bimg.getHeight();
-						maxWidthFilename = file.getName();
+		while (!stack.isEmpty()) {
+			DirectoryStream<Path> stream = Files.newDirectoryStream(stack.pop());
+			//System.out.println("Traversing directory="+stream.
+			for (Path entry : stream) {
+				if (Files.isDirectory(entry)) {
+					stack.push(entry);
+				}
+				else {
+					if(entry!=null && entry.toString().contains("jpeg")){
+						File file = entry.toFile();
+						files.add(entry);
+						//System.out.println(entry);
+						BufferedImage bimg = ImageIO.read(file);
+						//System.out.println(file.getName());
+						if(maxWidth<bimg.getWidth()){
+
+							maxWidth        = bimg.getWidth();
+							maxWidthHt         = bimg.getHeight();
+							maxWidthFilename = file.getName();
+						}
+
+						if(maxHeight<bimg.getHeight()){
+
+							maxHeight         = bimg.getHeight();
+							maxHeightWd        = bimg.getWidth();
+							maxHeightFilename = file.getName();
+						}
 					}
+				}
+			}
+			stream.close();
+		}
 
-					if(maxHeight<bimg.getHeight()){
-
-						maxHeight         = bimg.getHeight();
-						maxHeightWd        = bimg.getWidth();
-						maxHeightFilename = file.getName();
-					}
-	            }
-	        }
-	        stream.close();
-	    }
-
-	    return files;
+		return files;
 	}
-	
-	
+
+
 	public void findMaxWidthImage(String baseDir) {
 		File folder = new File(baseDir);
 		File[] listOfFiles = folder.listFiles();
