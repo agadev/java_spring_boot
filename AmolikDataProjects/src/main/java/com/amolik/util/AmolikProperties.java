@@ -47,18 +47,6 @@ public class AmolikProperties	{
 		String log4jPropertyFile = AmolikProperties.getProperty("log4jFile");
 		Properties log4jProperties = new Properties();
 
-		// Initialize log4j property file.      
-
-		//		try {
-		//			log4jProperties.load(new FileInputStream(log4jPropertyFile));
-		//
-		//		} catch (FileNotFoundException e) {
-		//
-		//			e.printStackTrace();
-		//		} catch (IOException e) {
-		//
-		//			e.printStackTrace();
-		//		}
 	}
 
 	public static void setProperties( String filePath){
@@ -100,8 +88,23 @@ public class AmolikProperties	{
 
 
 	public static void setProperty(String name,String value){
+		if (amolikProp == null)	
+			initialize();
 		amolikProp.setProperty(name,value);
 	}
+	
+	public static void saveProperties()
+    {
+            try {
+				FileOutputStream fr = new FileOutputStream(new File(System.getProperty("propertiesFile")));
+				amolikProp.store(fr,"");
+				fr.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+    }
 
 	public static Enumeration propertyNames(){
 		if(amolikProp == null) initialize();
