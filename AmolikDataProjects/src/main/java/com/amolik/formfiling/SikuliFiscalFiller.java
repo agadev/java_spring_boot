@@ -3,12 +3,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
 
-import com.amolik.util.AmolikProperties;
+import com.amolik.util.*;
+import com.amolik.util.Constants;
 
 public class SikuliFiscalFiller {
 
@@ -37,6 +39,10 @@ public class SikuliFiscalFiller {
 	private static String inputDataImageDir;
 	private static String inputFileDelimiter;
 	private static int lastRecordProcessed;
+	private static boolean isRemoveAccents;
+	private static boolean isInsertDuplicateRecords = false;
+	private static Set filledImagesSet = null;
+	private static Integer stopFillingRecordNumber;
 
 	public static void main(String[] args) {
 
@@ -53,8 +59,8 @@ public class SikuliFiscalFiller {
 		Settings.InfoLogs=false;
 		Settings.DebugLogs=false;
 		Settings.MoveMouseDelay=(float) 0.1;
-		
-		
+
+
 		ImagePath.add(imageDir);
 		try{
 
@@ -66,10 +72,20 @@ public class SikuliFiscalFiller {
 				logger.info("Loaded database in "+(
 						System.currentTimeMillis()-startTime)+" ms");
 			}
+			filledImagesSet= 
+					ExcelUtil.getExcelContentByColumnIndex(debtorDatabasePath, 0);
+
+			if(logger.isInfoEnabled()) {
+
+				logger.info(filledImagesSet);
+			}
+
 			startTime=System.currentTimeMillis();
+
+
 			try (BufferedReader reader = Files.newBufferedReader(Paths.get(inputDataFile))) {
 				String line = null;
-
+				
 				// if last directory is full loaded reset count to zero
 				if(lastRecordProcessed==200){
 
@@ -79,7 +95,12 @@ public class SikuliFiscalFiller {
 				int currentRecord=1;
 				while ((line = reader.readLine()) != null) {	
 
-					if(currentRecord>lastRecordProcessed){
+					if(isRemoveAccents){
+
+						line = StringUtility.getDeAccentedString(line);
+					}
+					if(currentRecord>lastRecordProcessed 
+							&& currentRecord<=stopFillingRecordNumber){
 
 						fillDebtorApplicationFromImage(s, line,currentRecord);
 
@@ -111,20 +132,48 @@ public class SikuliFiscalFiller {
 			logger.info(line);
 		}
 		String[] splited = line.split(inputFileDelimiter);
-
-
-		for (int i=0;i<splited.length;i++){
-
+        int arrayItems = splited.length;
+       // arrayItems=2;
+		
+			for (int i=0;i<arrayItems;i++){
 			if(i==0){
+
+
+				// detect whether duplicate record
+				if(!isInsertDuplicateRecords) {
+
+
+					String imageName = splited[i];
+					if(logger.isDebugEnabled()){
+
+						logger.debug("inside is insertnonduplicate");
+						logger.debug(filledImagesSet.contains(imageName.trim())); 
+					}
+					// if duplicate is found log warning
+					if(imageName!=null  	
+							&& !imageName.equals(Constants.EMPTY_STRING)
+							&& filledImagesSet.contains(imageName.trim())
+							) {
+
+						logger.warn("Image already exists skipping "+imageName);
+						return;
+					}
+
+				}
 				String inputDataImagePath= inputDataImageDir+fileSeparator+splited[i];
-
-
 				setDebtorApplicationRecordImage(s, inputDataImagePath);
 			}
 			else {
 
 				try {
 					String field= splited[i];
+					//field="àèìòùÀÈÌÒÙ";
+					//field="ä,Ä,ö,Ö,ü,Ü,ñ,Ñ,ý,Ý,ã";
+
+					if(logger.isDebugEnabled()){
+
+						logger.debug("fieldValue="+field);
+					}
 
 					// Trim if greater than 45
 					if(field.length()>45){
@@ -132,20 +181,24 @@ public class SikuliFiscalFiller {
 						field = field.substring(0,44).substring(0, 
 								field.lastIndexOf(" "));
 					}
-					s.type(field);
+					s.type(field);	
+
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					//e.printStackTrace();
+					e.printStackTrace();
+					//System.exit(1);
 				}
 
-				if(i<splited.length-1){
+				if(i<(arrayItems-1)){
 
 					s.type(Key.TAB);
+
 				}
 			}
 
 		}
+
 		s.type("s",KeyModifier.CTRL);
 		AmolikProperties.setProperty("sikuliFiller.lastRecordProcessed",
 				Integer.toString(currentRecord));
@@ -169,6 +222,7 @@ public class SikuliFiscalFiller {
 	public static void setDebtorApplicationDatabase(Screen s) 
 			throws FindFailed {
 
+		filledImagesSet = ExcelUtil.getExcelContentByColumnIndex(debtorDatabasePath, 0);
 		s.type("o", KeyModifier.CTRL);
 		s.click(new Pattern(fileNameImage)
 				.targetOffset(fileNameImageOffsetX,fileNameImageOffsetY));
@@ -254,6 +308,37 @@ public class SikuliFiscalFiller {
 
 		lastRecordProcessed = new Integer(
 				AmolikProperties.getProperty("sikuliFiller.lastRecordProcessed"));
+
+		stopFillingRecordNumber = new Integer(
+				AmolikProperties.getProperty("sikuliFiller.stopFillingRecordNumber"));
+
+		String isRemoveAccentsString = 
+				AmolikProperties.getProperty("sikuliFiller.isRemoveAccents");
+
+		if(isRemoveAccentsString!=null 
+				&& !isRemoveAccentsString.equals(Constants.EMPTY_STRING)){
+
+			if(isRemoveAccentsString.equalsIgnoreCase("Y")
+					||isRemoveAccentsString.equalsIgnoreCase("Yes")) {
+
+				isRemoveAccents = true;
+			}
+
+		}
+
+		String isInsertDuplicateRecordsString = 
+				AmolikProperties.getProperty("sikuliFiller.isInsertDuplicateRecords");
+
+		if(isInsertDuplicateRecordsString!=null 
+				&& !isInsertDuplicateRecordsString.equals(Constants.EMPTY_STRING)){
+
+			if(isInsertDuplicateRecordsString.equalsIgnoreCase("Y")
+					||isInsertDuplicateRecordsString.equalsIgnoreCase("Yes")) {
+
+				isInsertDuplicateRecords = true;
+			}
+
+		}
 
 		if(logger.isDebugEnabled()){
 
