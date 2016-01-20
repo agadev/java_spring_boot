@@ -75,7 +75,10 @@ public class FiscalEncrypterDecrypter {
 				"21 months";
 		//"Üñited Staté of America";
 
-		String encryptedText ="[j/YmsO3lviCV9jrZdB7/BVIIZ+UUXwCs78dThn4O5zXWpeTu9NqfHM3UmJTRmWghCAQSPQ3I6g8It6lgIJ1yxqhTXw5viJIg2e6Kext2Nwg9tDrlU1JtEx9GDFVCCVgnsYIm15u8uvenLjNZcOGC7eHB46TLGJzepMxgzndmmkzYrYmDg4r2/19QEvj6wMHl]";
+		String encryptedText ="[5RTgkl9ZxZvkZUdQoAwdYOes17h1CO8ayzQfZtnxf4R8R+aDqZDi4zF0UQ95kb2VXw4/uB5MpIRO8Jrq/JzDczJNG3zyHPNkVbLvJSoM2fcJwZtwxWbgdgjJlSJ5iwmuamybnK7MTHwoBj8av5fcpxKpL0ASjnQa7PB3O2Doi4Q=]";
+			//	"[v/VoxTgdvFHDLunz/7KN+ARDJd/hDrm6r0UrRyTYMcJlnfXrKbJB7k6TLXuw56Ygks+gn12U1eTEB7mX+0B1CQ/93xG1U3QMWBoNSFLSsOk3lexufEgYXC5C+rhNnRVxjJpLMm1Z5jNWVHnqh9B3WibHFaneq35nQGWGppXI3LM3P1ZvfVylvw==]";
+
+				//"[j/YmsO3lviCV9jrZdB7/BVIIZ+UUXwCs78dThn4O5zXWpeTu9NqfHM3UmJTRmWghCAQSPQ3I6g8It6lgIJ1yxqhTXw5viJIg2e6Kext2Nwg9tDrlU1JtEx9GDFVCCVgnsYIm15u8uvenLjNZcOGC7eHB46TLGJzepMxgzndmmkzYrYmDg4r2/19QEvj6wMHl]";
 		//"[/XgEkkmnmyjsPZTM10QNR9tQgPLXzfRhaDwsCInPjIrsizIYm/ERv8hoSN7fBJaSaE0mZfToMmodLujWiUqQlULkxXb5S6FgMPw5mGEvLKfpQH4zVXwoC2VYufmyfrp5l4zzuZyrdwog8gNslJ8YKh0iT2+ufyqDBuXhDqOeBc6lJipa1Txq6w==]";
 		//"[HOeiNKHZVEGkFZ8iEFiBDzIBEjghxa86FpR/yMOITYkuTDEf18SfTUt3bkFTlHryUva+Wn63ozExev0GTE99BALXVQqTpe74gwJXNSDpzQZnSLD51rjX589zCLzvzKAsjXSBaOWuFwYUwMrewsSXez58gQBV/6ucgEMbW9vVMfs=]";
 		//"[Y9DCFFIGOJqsXyUa6ye8joEfVzFQTUXidnLpA49yB0SYcoI9+mkHxK5Q50LAZN4P75bZmGSTSBeaq/drdizM3b+2YlGqfkZdGFZI96JnNcNJPizEd/NaKJWTQGk8t8Uyet0XRMDo+MdxX0BLPHhej3dBUJz2RMEk0nZSGK99GXg=]";
@@ -84,8 +87,10 @@ public class FiscalEncrypterDecrypter {
 		
 		if(logger.isInfoEnabled()){
 			
-			logger.info(plainText +"|Encrypted="+encrypted);
-			logger.info(encryptedText +"|Decrypted="+decrypted);
+			logger.info(plainText);
+			logger.info("|Encrypted="+encrypted);
+			logger.info(encryptedText);
+			logger.info("|Decrypted="+decrypted);
 			
 		}
 
