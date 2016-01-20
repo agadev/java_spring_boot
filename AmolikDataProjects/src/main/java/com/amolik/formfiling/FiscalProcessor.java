@@ -117,37 +117,37 @@ public class FiscalProcessor {
 
 			for (FiscalRecord record : recordList) {
 				// System.out.println(name);
-				writer.write(record.getImageFileName()
+				writer.write(record.getImageFileName()+outputFileDelimiter+"\n"
 						+outputFileDelimiter+record.getSrNo()
 						+outputFileDelimiter+record.getEmpIdNo()
 						+outputFileDelimiter+record.getOccuranceNo()
 						+outputFileDelimiter+record.getLoanFileNo()
 						+outputFileDelimiter+record.getLoanAmount()
 						+outputFileDelimiter+record.getRateOfInterest()
-						+outputFileDelimiter+record.getTenure()
+						+outputFileDelimiter+record.getTenure()+outputFileDelimiter+"\n"
 						+outputFileDelimiter+record.getTotalLoan()
 						+outputFileDelimiter+record.getEmi()
 						+outputFileDelimiter+record.getOtherLoans()
 						+outputFileDelimiter+record.getInitials()
-						+outputFileDelimiter+record.getEmpName()
+						+outputFileDelimiter+record.getEmpName()+outputFileDelimiter+"\n"
 						+outputFileDelimiter+record.getAddress()
 						+outputFileDelimiter+record.getCity()
 						+outputFileDelimiter+record.getState()
 						+outputFileDelimiter+record.getZip()
-						+outputFileDelimiter+record.getCountry()
+						+outputFileDelimiter+record.getCountry()+outputFileDelimiter+"\n"
 						+outputFileDelimiter+record.getContactMode()
 						+outputFileDelimiter+record.getMaritalStatus()
 						+outputFileDelimiter+record.getRefName()
 						+outputFileDelimiter+record.getYearsOfEmployment()
 						+outputFileDelimiter+record.getDesignation()
-						+outputFileDelimiter+record.getDepartment()
+						+outputFileDelimiter+record.getDepartment()+outputFileDelimiter+"\n"
 						+outputFileDelimiter+record.getPerformance()
 						+outputFileDelimiter+record.getBasicSalary()
 						+outputFileDelimiter+record.getCenterName()
-						+outputFileDelimiter+record.getIssuerBank()
+						+outputFileDelimiter+record.getIssuerBank()+outputFileDelimiter+"\n"
 						+outputFileDelimiter+record.getHealthId()
-						+outputFileDelimiter+record.getHealthInsuranceProvider()
-						+"\n"
+						+outputFileDelimiter+record.getHealthInsuranceProvider()+outputFileDelimiter+"\n"
+						+"================================================================================================="+"\n"
 						);
 			}
 		} catch (IOException e) {
@@ -397,7 +397,8 @@ public class FiscalProcessor {
 		}
 
 
-		String[] splited = oneOrMoreSpacePattern.split(secondLine);
+		//String[] splited = oneOrMoreSpacePattern.split(secondLine);
+		String[] splited = oneOrMoreSpacePattern.split(secondLine,5);
 
 		tillSetInitials :
 			for (int i=0;i<splited.length;i++) {
@@ -411,8 +412,11 @@ public class FiscalProcessor {
 				case 3: record.setOtherLoans(StringUtility.trim(splited[i]));
 				break;
 				case 4: record.setInitials(StringUtility.trim(splited[i]));
-				break tillSetInitials;
-
+				break 
+				//tillSetInitials
+				;
+				case 5: record.setEmpName(StringUtility.trim(splited[i]));
+				break;
 				}
 			}
 		/* first 3 record are found; last record( person name) is found by adding 
@@ -420,10 +424,10 @@ public class FiscalProcessor {
 		 * 
 		 */
 
-		int startIndexOfOccuranceNo = secondLine.lastIndexOf(record.getInitials());
-		int endIndexOfOccuranceNo=startIndexOfOccuranceNo+record.getInitials().length();
-		record.setEmpName(StringUtility.trim(
-				secondLine.substring(endIndexOfOccuranceNo+1)));
+//		int startIndexOfInitials = secondLine.lastIndexOf(record.getInitials());
+//		int endIndexOfInitials=startIndexOfInitials+record.getInitials().length();
+//		record.setEmpName(StringUtility.trim(
+//				secondLine.substring(endIndexOfInitials+1)));
 
 		if(logger.isDebugEnabled()){
 
@@ -835,17 +839,17 @@ public class FiscalProcessor {
 
 		record.setOtherLoans(fixNumericInNonNumericField(record.getOtherLoans()));
 		record.setInitials(fixNumericInNonNumericField(record.getInitials()));
-		record.setEmpName(fixNumericInNonNumericField(record.getEmpName()));
-		record.setCity(fixNumericInNonNumericField(record.getCity()));
-		record.setState(fixNumericInNonNumericField(record.getState()));
-		record.setCountry(fixNumericInNonNumericField(record.getCountry()));
-		record.setContactMode(fixNumericInNonNumericField(record.getContactMode()));
-		record.setMaritalStatus(fixNumericInNonNumericField(record.getMaritalStatus()));
-		record.setRefName(fixNumericInNonNumericField(record.getRefName()));
-		record.setDesignation(fixNumericInNonNumericField(record.getDesignation()));
-		record.setDepartment(fixNumericInNonNumericField(record.getDepartment()));
-		record.setRefName(fixNumericInNonNumericField(record.getRefName()));
-		record.setIssuerBank(fixNumericInNonNumericField(record.getIssuerBank()));
+		record.setEmpName(fixNumericInNonNumericFieldExceptZero(record.getEmpName()));
+		record.setCity(fixNumericInNonNumericFieldExceptZero(record.getCity()));
+		record.setState(fixNumericInNonNumericFieldExceptZero(record.getState()));
+		record.setCountry(fixNumericInNonNumericFieldExceptZero(record.getCountry()));
+		record.setContactMode(fixNumericInNonNumericFieldExceptZero(record.getContactMode()));
+		record.setMaritalStatus(fixNumericInNonNumericFieldExceptZero(record.getMaritalStatus()));
+		record.setRefName(fixNumericInNonNumericFieldExceptZero(record.getRefName()));
+		record.setDesignation(fixNumericInNonNumericFieldExceptZero(record.getDesignation()));
+		record.setDepartment(fixNumericInNonNumericFieldExceptZero(record.getDepartment()));
+		record.setRefName(fixNumericInNonNumericFieldExceptZero(record.getRefName()));
+		record.setIssuerBank(fixNumericInNonNumericFieldExceptZero(record.getIssuerBank()));
 
 	}
 
@@ -864,6 +868,19 @@ public class FiscalProcessor {
 		return field;
 	}
 
+	public String fixNumericInNonNumericFieldExceptZero(String field){
+
+
+		if(field!=null && field.trim().equals(Constants.EMPTY_STRING)) {
+
+			field=field.replaceAll("[2]", "Z")
+					.replaceAll("[5]", "S")
+					.replaceAll("[1]","l")
+					;
+		}
+
+		return field;
+	}
 	public void printFiscalRecord(FiscalRecord record){
 
 		if(logger.isInfoEnabled()){
