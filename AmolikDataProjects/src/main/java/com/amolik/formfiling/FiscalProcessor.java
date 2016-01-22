@@ -229,6 +229,11 @@ public class FiscalProcessor {
 					fixNonNumericFields(fiscalRecord);
 					fixYearsOfEmployment(fiscalRecord);
 					fixRefName(fiscalRecord);
+					fixIssuerBank(fiscalRecord);
+					fixLoanFileNo(fiscalRecord);
+					fixState(fiscalRecord);
+					fixAddress(fiscalRecord);
+					fixSrNo(fiscalRecord);
 					printFiscalRecord(fiscalRecord);
 					// Add to list 
 					recordList.add(fiscalRecord);
@@ -345,9 +350,124 @@ public class FiscalProcessor {
 				loanFileNo = loanFileNo.replaceAll(Constants.ONE_OR_MORE_SPACE_STRING,
 						Constants.EMPTY_STRING);
 
+				loanFileNo = loanFileNo.replace("/", " / ");
+				loanFileNo = loanFileNo.trim();
+				//				loanFileNo = loanFileNo.replaceAll("[^A-Za-z0-9]", 
+				//						Constants.SPACE_FORWARD_SLASH_SPACE);
+			}
+		}
+		record.setLoanFileNo(loanFileNo);
 
-				loanFileNo = loanFileNo.replaceAll("[^A-Za-z0-9]", 
-						Constants.SPACE_FORWARD_SLASH_SPACE);
+		if(logger.isDebugEnabled()){
+
+			logger.debug(record.getSrNo()
+					+Constants.DOUBLE_PIPE+record.getEmpIdNo()
+					+Constants.DOUBLE_PIPE+record.getOccuranceNo()
+					+Constants.DOUBLE_PIPE+record.getLoanFileNo()
+					+Constants.DOUBLE_PIPE+record.getLoanAmount()
+					+Constants.DOUBLE_PIPE+record.getRateOfInterest()
+					+Constants.DOUBLE_PIPE+record.getTenure()
+					);
+		}
+
+		return record;
+	}
+
+	public  FiscalRecord setFiscalRecordFromLine1New(String firstLine,FiscalRecord record){
+
+		if (logger.isDebugEnabled()) {
+
+			logger.debug(firstLine); //$NON-NLS-1$
+		}
+		StringBuffer printString = new StringBuffer();
+
+		// Check to see if special character for beginning of record
+		Matcher m = Pattern.compile("[\\W]").matcher(firstLine);
+
+
+		if(m.find(0)){
+
+			firstLine=firstLine.substring(1);
+		}
+
+		int lastIndexOfPercentage = setMonthsFieldAndGetIndex(firstLine, record);
+
+		if(lastIndexOfPercentage >1) {
+
+			firstLine= firstLine.substring(0, lastIndexOfPercentage+1);
+		}
+
+		else {
+
+			logger.error("% symbol not found in line|"+firstLine);
+		}
+
+
+		int dollarIndex = firstLine.lastIndexOf("$");
+
+		String[] amountPercentArray = oneOrMoreSpacePattern.split(firstLine.substring(dollarIndex));
+
+		if(logger.isDebugEnabled()){
+
+			logger.debug("dollarSubstring="+firstLine.substring(dollarIndex));
+		}
+
+		if(amountPercentArray.length==2){
+
+			record.setLoanAmount(amountPercentArray[0]);
+			record.setRateOfInterest(amountPercentArray[1]);
+			firstLine = firstLine.substring(0,dollarIndex);
+			if(logger.isDebugEnabled()){
+
+				logger.debug("recordLoanAmount="+record.getLoanAmount()
+				+ "|RateOfInterest="+record.getRateOfInterest()
+				+"|firstLine="+firstLine);
+			}
+		}
+
+
+		String[] splited = oneOrMoreSpacePattern.split(firstLine);
+
+
+		StringBuffer loanFileNoBuffer = new StringBuffer();
+		for (int i=0;i<splited.length;i++) {
+
+
+			switch (i+1){
+
+			case 1: record.setSrNo(StringUtility.trim(splited[i]));
+			break;
+			case 2: record.setEmpIdNo(StringUtility.trim(splited[i]));
+			break;
+			case 3:record.setOccuranceNo(StringUtility.trim(splited[i]));
+			break;
+
+			}
+		}	
+
+
+
+		int startIndexOfOccuranceNo = firstLine.lastIndexOf(record.getOccuranceNo());
+		int endIndexOfOccuranceNo=startIndexOfOccuranceNo+record.getOccuranceNo().length();
+		String loanFileNo = firstLine.substring(endIndexOfOccuranceNo+1);
+
+		if(logger.isDebugEnabled()){
+
+			logger.debug("loanFileNo="+loanFileNo);
+		}
+		if(loanFileNo!=null
+				&&!loanFileNo.equals(Constants.EMPTY_STRING)){
+
+			Matcher m1 = spaceSlashSpacePattern.matcher(loanFileNo);
+
+			if(!m1.matches()) {
+
+				loanFileNo = loanFileNo.replaceAll(Constants.ONE_OR_MORE_SPACE_STRING,
+						Constants.EMPTY_STRING);
+
+
+				//				loanFileNo = loanFileNo.replaceAll("[^A-Za-z0-9]", 
+				//						Constants.SPACE_FORWARD_SLASH_SPACE);
 			}
 		}
 		record.setLoanFileNo(loanFileNo);
@@ -424,10 +544,10 @@ public class FiscalProcessor {
 		 * 
 		 */
 
-//		int startIndexOfInitials = secondLine.lastIndexOf(record.getInitials());
-//		int endIndexOfInitials=startIndexOfInitials+record.getInitials().length();
-//		record.setEmpName(StringUtility.trim(
-//				secondLine.substring(endIndexOfInitials+1)));
+		//		int startIndexOfInitials = secondLine.lastIndexOf(record.getInitials());
+		//		int endIndexOfInitials=startIndexOfInitials+record.getInitials().length();
+		//		record.setEmpName(StringUtility.trim(
+		//				secondLine.substring(endIndexOfInitials+1)));
 
 		if(logger.isDebugEnabled()){
 
@@ -621,7 +741,9 @@ public class FiscalProcessor {
 				else if(splited.length>=3) {
 
 					// if true that means it contains position field
-					if(splited[i]!=null && !splited[i].trim().equalsIgnoreCase("NOT")){
+					if(splited[i]!=null &&
+							!(StringUtility.getDeAccentedString(splited[i])).trim()
+							.equalsIgnoreCase("NOT")){
 
 						record.setDesignation(
 								StringUtility.trim(splited[i-1]+Constants.SPACE+splited[i]));
@@ -635,7 +757,9 @@ public class FiscalProcessor {
 
 			case 3:
 				if(splited.length==3){
-					if(splited[i]!=null && !splited[i].trim().equalsIgnoreCase("AVAILABLE")){
+					if(splited[i]!=null 
+							&& !(StringUtility.getDeAccentedString(splited[i])).trim()
+							.equalsIgnoreCase("AVAILABLE")){
 
 						record.setDepartment(
 								StringUtility.trim(splited[i])); 
@@ -786,6 +910,7 @@ public class FiscalProcessor {
 					.replaceAll("(?i)o", "0")
 					.replaceAll("(?i)s", "5")
 					.replaceAll("(?i)z", "2")
+					.replaceAll("S", "5")
 					;
 		}
 
@@ -799,10 +924,28 @@ public class FiscalProcessor {
 		if(field!=null
 				&&!field.equals(Constants.EMPTY_STRING)) {
 
-			record.setYearsOfEmployment(
-					record.getYearsOfEmployment()
-					.replaceAll("(?i)L|(?i)I", "1")
-					);
+			field = field.replaceAll("(?i)L|(?i)I", "1");
+			if(field.charAt(0)=='s' || field.charAt(0)=='S') {
+
+				field = field.replaceFirst("s|S", "5");
+			}
+			
+			 if(field.charAt(1)=='S') {
+
+				 field = field.replaceFirst("S", "5");
+			}
+			//			String deAccentedField = StringUtility.getDeAccentedString(field);
+			//			deAccentedField = deAccentedField.toUpperCase();
+			//			
+			//			if(deAccentedField.contains("YEAR")){
+			//				
+			//				int indexOfYears = deAccentedField.indexOf("YEAR");
+			//				String beforeSubString = 
+			//						fixNonNumericCharInNumericField(field.substring(0,indexOfYears+1));
+			//				String afterSubString = field.substring(indexOfYears+1);
+			//				field = beforeSubString+afterSubString;
+			//			}
+			record.setYearsOfEmployment(field);
 		}
 	}
 
@@ -827,8 +970,13 @@ public class FiscalProcessor {
 		if(field!=null
 				&&!field.equals(Constants.EMPTY_STRING)) {
 
-			if(record.getLoanFileNo().indexOf(" / ") < 7 ){
-				record.setLoanFileNo(record.getLoanFileNo().replaceFirst(" / ", "Ï"));
+			int indexOfSlash = field.indexOf("/");
+			if(indexOfSlash >1){
+
+				field = field.substring(0,indexOfSlash+1)
+						+fixNonNumericCharInNumericField(field.substring(indexOfSlash+1));
+
+				record.setLoanFileNo(field);
 			}
 		}
 
@@ -849,20 +997,17 @@ public class FiscalProcessor {
 		record.setDesignation(fixNumericInNonNumericFieldExceptZero(record.getDesignation()));
 		record.setDepartment(fixNumericInNonNumericFieldExceptZero(record.getDepartment()));
 		record.setRefName(fixNumericInNonNumericFieldExceptZero(record.getRefName()));
-		record.setIssuerBank(fixNumericInNonNumericFieldExceptZero(record.getIssuerBank()));
+		//record.setIssuerBank(fixNumericInNonNumericFieldExceptZero(record.getIssuerBank()));
 
 	}
 
 	public String fixNumericInNonNumericField(String field){
 
 
-		if(field!=null && field.trim().equals(Constants.EMPTY_STRING)) {
+		if(field!=null && !field.trim().equals(Constants.EMPTY_STRING)) {
 
-			field=field.replaceAll("[2]", "Z")
-					.replaceAll("[0]", "O")
-					.replaceAll("[5]", "S")
-					.replaceAll("[1]","l")
-					;
+			field=field.replaceAll("[0]", "O");
+			field = fixNumericInNonNumericFieldExceptZero(field);
 		}
 
 		return field;
@@ -871,12 +1016,77 @@ public class FiscalProcessor {
 	public String fixNumericInNonNumericFieldExceptZero(String field){
 
 
-		if(field!=null && field.trim().equals(Constants.EMPTY_STRING)) {
+		if(field!=null && !field.trim().equals(Constants.EMPTY_STRING)) {
 
 			field=field.replaceAll("[2]", "Z")
 					.replaceAll("[5]", "S")
 					.replaceAll("[1]","l")
+					.replaceAll("[8]","B")
 					;
+		}
+
+		return field;
+	}
+	public String fixIssuerBank(FiscalRecord record){
+
+		String field = record.getIssuerBank();
+
+		if(field!=null && !field.trim().equals(Constants.EMPTY_STRING)) {
+
+
+			field=field.replaceAll("feu", "fcu");
+			field=field.replaceAll("Feu", "Fcu");
+			field=field.replaceAll("Lie", "Llc");
+			field=field.replaceAll("lie", "llc");
+			record.setIssuerBank(StringUtility.trim(field));
+
+		}
+
+		return field;
+	}
+
+	public String fixSrNo(FiscalRecord record){
+
+		String field = record.getSrNo();
+
+		if(field!=null && !field.trim().equals(Constants.EMPTY_STRING)) {
+
+
+			field=field.replaceAll("!", "1");
+			record.setSrNo(StringUtility.trim(field));
+
+		}
+
+		return field;
+	}
+
+	public String fixState(FiscalRecord record){
+
+		String field = record.getState();
+
+		if(field!=null && !field.trim().equals(Constants.EMPTY_STRING)) {
+
+
+			field=field.replaceAll("FI", "Fl");
+			field=field.replaceAll("F1", "Fl");
+			record.setState(StringUtility.trim(field));
+
+		}
+
+		return field;
+	}
+
+	public String fixAddress(FiscalRecord record){
+
+		String field = record.getAddress();
+
+		if(field!=null && !field.trim().equals(Constants.EMPTY_STRING)) {
+
+
+			field=field.replaceAll("lOst", "10st");
+			record.setAddress(StringUtility.trim(field));
+
+
 		}
 
 		return field;
