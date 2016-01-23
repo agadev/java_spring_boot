@@ -30,8 +30,8 @@ public class FiscalRecord {
 	private String basicSalary;
 	private String centerName;
 	private String issuerBank;
-	private String healthId;
-	private String healthInsuranceProvider;
+	private String carrierName;
+	private String eisCode;
 	
 	
 	public String getImageFileName() {
@@ -202,16 +202,16 @@ public class FiscalRecord {
 	public void setIssuerBank(String issuerBank) {
 		this.issuerBank = issuerBank;
 	}
-	public String getHealthId() {
-		return healthId;
+	public String getCarrierName() {
+		return carrierName;
 	}
-	public void setHealthId(String healthId) {
-		this.healthId = healthId;
+	public void setCarrierName(String healthId) {
+		this.carrierName = healthId;
 	}
-	public String getHealthInsuranceProvider() {
-		return healthInsuranceProvider;
+	public String getEisCode() {
+		return eisCode;
 	}
-	public void setHealthInsuranceProvider(String healthInsuranceProvider) {
-		this.healthInsuranceProvider = healthInsuranceProvider;
+	public void setEisCode(String healthInsuranceProvider) {
+		this.eisCode = healthInsuranceProvider;
 	}
 }
