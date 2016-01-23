@@ -109,51 +109,7 @@ public class FiscalProcessor {
 		String outputFilePath = inputFileDir
 				+fileSeparator+outFileNameWithoutExt;
 
-		if(logger.isInfoEnabled()){
-
-			logger.info("Writing record to file="+outputFilePath);
-		}
-		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFilePath))) {
-
-			for (FiscalRecord record : recordList) {
-				// System.out.println(name);
-				writer.write(record.getImageFileName()+outputFileDelimiter+"\n"
-						+outputFileDelimiter+record.getSrNo()
-						+outputFileDelimiter+record.getEmpIdNo()
-						+outputFileDelimiter+record.getOccuranceNo()
-						+outputFileDelimiter+record.getLoanFileNo()
-						+outputFileDelimiter+record.getLoanAmount()
-						+outputFileDelimiter+record.getRateOfInterest()
-						+outputFileDelimiter+record.getTenure()+outputFileDelimiter+"\n"
-						+outputFileDelimiter+record.getTotalLoan()
-						+outputFileDelimiter+record.getEmi()
-						+outputFileDelimiter+record.getOtherLoans()
-						+outputFileDelimiter+record.getInitials()
-						+outputFileDelimiter+record.getEmpName()+outputFileDelimiter+"\n"
-						+outputFileDelimiter+record.getAddress()
-						+outputFileDelimiter+record.getCity()
-						+outputFileDelimiter+record.getState()
-						+outputFileDelimiter+record.getZip()
-						+outputFileDelimiter+record.getCountry()+outputFileDelimiter+"\n"
-						+outputFileDelimiter+record.getContactMode()
-						+outputFileDelimiter+record.getMaritalStatus()
-						+outputFileDelimiter+record.getRefName()
-						+outputFileDelimiter+record.getYearsOfEmployment()
-						+outputFileDelimiter+record.getDesignation()
-						+outputFileDelimiter+record.getDepartment()+outputFileDelimiter+"\n"
-						+outputFileDelimiter+record.getPerformance()
-						+outputFileDelimiter+record.getBasicSalary()
-						+outputFileDelimiter+record.getCenterName()
-						+outputFileDelimiter+record.getIssuerBank()+outputFileDelimiter+"\n"
-						+outputFileDelimiter+record.getHealthId()
-						+outputFileDelimiter+record.getHealthInsuranceProvider()+outputFileDelimiter+"\n"
-						+"================================================================================================="+"\n"
-						);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		 
+		 FileUtility.writeDelimitedRecordsToFile(outputFilePath, outputFileDelimiter, recordList);
 	}
 
 
@@ -870,18 +826,18 @@ public class FiscalProcessor {
 
 				switch (j+1){
 
-				case 1: record.setHealthId(StringUtility.trim(splited[j]));
+				case 1: record.setCarrierName(StringUtility.trim(splited[j]));
 				break;
 				case 2:
-					record.setHealthInsuranceProvider(StringUtility.trim(splited[j]));
+					record.setEisCode(StringUtility.trim(splited[j]));
 					break forLoop;
 				}
 			}
 
 		if(logger.isDebugEnabled()) {
 
-			logger.debug(record.getHealthId()
-					+Constants.DOUBLE_PIPE+record.getHealthInsuranceProvider());
+			logger.debug(record.getCarrierName()
+					+Constants.DOUBLE_PIPE+record.getEisCode());
 		}
 	}
 
@@ -1131,8 +1087,8 @@ public class FiscalProcessor {
 					+Constants.DOUBLE_PIPE+record.getIssuerBank()
 					);
 
-			logger.info(record.getHealthId()
-					+Constants.DOUBLE_PIPE+record.getHealthInsuranceProvider());
+			logger.info(record.getCarrierName()
+					+Constants.DOUBLE_PIPE+record.getEisCode());
 		}
 	}
 }
