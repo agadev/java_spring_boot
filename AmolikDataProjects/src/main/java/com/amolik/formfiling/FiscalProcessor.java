@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -30,6 +31,7 @@ public class FiscalProcessor {
 
 
 	Pattern oneOrMoreSpacePattern = Pattern.compile(Constants.ONE_OR_MORE_SPACE_STRING);
+	DecimalFormat fourDigitFormatter = new DecimalFormat("0000");
 
 	/**
 	 * Logger for this class
@@ -55,6 +57,8 @@ public class FiscalProcessor {
 	private static String outputFileDelimiter;
 
 	private static String inputFileFullName;
+
+	private String outFileDir;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -96,6 +100,7 @@ public class FiscalProcessor {
 	public void initializeFromPropertyFile() {
 
 		inputFileDir = AmolikProperties.getProperty("fiscalprocessor.inputFileDir");
+		outFileDir = AmolikProperties.getProperty("fiscalprocessor.outputFileDir");
 		fileSeparator = System.getProperty("file.separator");
 		inputFileName = AmolikProperties.getProperty("fiscalprocessor.inputfileName");
 		outputFileDelimiter = AmolikProperties.getProperty("fiscalprocessor.outputFileDelimiter");
@@ -106,10 +111,10 @@ public class FiscalProcessor {
 	private void writeDelimitedRecordsToFile(String outFileNameWithoutExt,
 			String outputFileDelimiter,List<FiscalRecord> recordList) {
 
-		String outputFilePath = inputFileDir
+		String outputFilePath = outFileDir
 				+fileSeparator+outFileNameWithoutExt;
 
-		 FileUtility.writeDelimitedRecordsToFile(outputFilePath, outputFileDelimiter, recordList);
+		FileUtility.writeDelimitedRecordsToFile(outputFilePath, outputFileDelimiter, recordList);
 	}
 
 
@@ -138,7 +143,10 @@ public class FiscalProcessor {
 				//stream.forEach((line)->{
 
 				lineNum[0]++;
-				String imgFileName = baseFile+(baseRecordCount[0]+recordList.size()+1)+".jpeg";
+				String imgFileName = baseFile+(
+						fourDigitFormatter.format(baseRecordCount[0]+recordList.size()+1))
+						+".jpeg";
+
 				fiscalRecord.setImageFileName(imgFileName);
 				switch(lineNum[0]){
 
@@ -190,6 +198,7 @@ public class FiscalProcessor {
 					fixState(fiscalRecord);
 					fixAddress(fiscalRecord);
 					fixSrNo(fiscalRecord);
+					fixAllAmountFieldsMissingDot(fiscalRecord);
 					printFiscalRecord(fiscalRecord);
 					// Add to list 
 					recordList.add(fiscalRecord);
@@ -873,6 +882,41 @@ public class FiscalProcessor {
 		return field;
 	}
 
+	public void fixAllAmountFieldsMissingDot(FiscalRecord record){
+		
+		record.setLoanAmount(
+				replaceLastCommaForMissingDot(record.getLoanAmount()));
+		
+		record.setTotalLoan(
+				replaceLastCommaForMissingDot(record.getTotalLoan()));
+		
+		record.setEmi(
+				replaceLastCommaForMissingDot(record.getEmi()));
+		
+		record.setBasicSalary(
+				replaceLastCommaForMissingDot(record.getBasicSalary()));
+		
+	}
+	public String replaceLastCommaForMissingDot(String field){
+
+		if(field!=null
+				&&!field.equals(Constants.EMPTY_STRING)) {
+
+
+			int indexOfDot = field.indexOf(Constants.DOT);
+			if(indexOfDot<0) {
+
+
+				int lastIndexOfComma = field.lastIndexOf(Constants.COMMA);
+
+				field=field.substring(0,lastIndexOfComma)+Constants.DOT
+						+field.substring(lastIndexOfComma+1);
+			}
+		}
+
+		return field;
+	}
+
 	public void fixYearsOfEmployment(FiscalRecord record) {
 
 		String field = record.getYearsOfEmployment();
@@ -885,10 +929,10 @@ public class FiscalProcessor {
 
 				field = field.replaceFirst("s|S", "5");
 			}
-			
-			 if(field.charAt(1)=='S') {
 
-				 field = field.replaceFirst("S", "5");
+			if(field.charAt(1)=='S') {
+
+				field = field.replaceFirst("S", "5");
 			}
 			//			String deAccentedField = StringUtility.getDeAccentedString(field);
 			//			deAccentedField = deAccentedField.toUpperCase();
