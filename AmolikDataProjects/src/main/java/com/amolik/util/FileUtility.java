@@ -1,6 +1,7 @@
 package com.amolik.util;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -15,12 +16,19 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Logger;
+
+import com.amolik.data.FiscalRecord;
+import com.amolik.formfiling.FiscalProcessor;
+
 public class FileUtility {
+
+	private static final Logger logger = Logger.getLogger(FileUtility.class);
 
 	int maxWidth          = 0;
 	int maxWidthHt    =0;
 
-	int maxHeight    = 0;
+	int maxHeight    = 115;
 	int maxHeightWd  =0;
 	String maxWidthFilename="";
 	String maxHeightFilename="";
@@ -29,20 +37,72 @@ public class FileUtility {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		String baseDir = "E:\\Automation\\KOMAL\\FISCAL\\RAW_DATA\\RUPESH\\";
+		String baseDir = "E:\\FISCAL_DATA\\FEB2016";
 		//findMaxWidthImage(baseDir);
 		//findMaxWidthImageUsingNio(Paths.get(baseDir));
 		FileUtility fileUtil = new FileUtility();
 		fileUtil.getRecursiveFileList(Paths.get(baseDir));
-		System.out.println("Max Width Image="+fileUtil.maxWidthFilename
-				+"|Height="+fileUtil.maxWidthHt
-				+"|Width="+fileUtil.maxWidth);
 
-		System.out.println("Max Height Image="+fileUtil.maxHeightFilename
-				+"|Height="+fileUtil.maxHeight
-				+"|Width="+fileUtil.maxHeightWd);
+		if(logger.isInfoEnabled()) {
+			logger.info("Max Width Image="+fileUtil.maxWidthFilename
+					+"|Height="+fileUtil.maxWidthHt
+					+"|Width="+fileUtil.maxWidth);
+
+//			logger.info("Max Height Image="+fileUtil.maxHeightFilename
+//					+"|Height="+fileUtil.maxHeight
+//					+"|Width="+fileUtil.maxHeightWd);
+		}
 	}
 
+	public static void writeDelimitedRecordsToFile(String outputFilePath,
+			String outputFileDelimiter,List<FiscalRecord> recordList) {
+
+		if(logger.isInfoEnabled()){
+
+			logger.info("Writing record to file="+outputFilePath);
+		}
+		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFilePath))) {
+
+			for (FiscalRecord record : recordList) {
+				// System.out.println(name);
+				writer.write(record.getImageFileName()+"\n"
+						+record.getSrNo()
+						+outputFileDelimiter+record.getEmpIdNo()
+						+outputFileDelimiter+record.getOccuranceNo()
+						+outputFileDelimiter+record.getLoanFileNo()
+						+outputFileDelimiter+record.getLoanAmount()
+						+outputFileDelimiter+record.getRateOfInterest()
+						+outputFileDelimiter+record.getTenure()+outputFileDelimiter+"\n"
+						+record.getTotalLoan()
+						+outputFileDelimiter+record.getEmi()
+						+outputFileDelimiter+record.getOtherLoans()
+						+outputFileDelimiter+record.getInitials()
+						+outputFileDelimiter+record.getEmpName()+outputFileDelimiter+"\n"
+						+record.getAddress()
+						+outputFileDelimiter+record.getCity()
+						+outputFileDelimiter+record.getState()
+						+outputFileDelimiter+record.getZip()
+						+outputFileDelimiter+record.getCountry()+outputFileDelimiter+"\n"
+						+record.getContactMode()
+						+outputFileDelimiter+record.getMaritalStatus()
+						+outputFileDelimiter+record.getRefName()
+						+outputFileDelimiter+record.getYearsOfEmployment()
+						+outputFileDelimiter+record.getDesignation()
+						+outputFileDelimiter+record.getDepartment()+outputFileDelimiter+"\n"
+						+record.getPerformance()
+						+outputFileDelimiter+record.getBasicSalary()
+						+outputFileDelimiter+record.getCenterName()
+						+outputFileDelimiter+record.getIssuerBank()+outputFileDelimiter+"\n"
+						+record.getCarrierName()
+						+outputFileDelimiter+record.getEisCode()+outputFileDelimiter+"\n"
+						+"================================================================================================="+"\n"
+						);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		 
+	}
 
 
 	public List<Path> getRecursiveFileList(Path path) throws IOException {
@@ -54,18 +114,19 @@ public class FileUtility {
 
 		while (!stack.isEmpty()) {
 			DirectoryStream<Path> stream = Files.newDirectoryStream(stack.pop());
-			//System.out.println("Traversing directory="+stream.
+
 			for (Path entry : stream) {
 				if (Files.isDirectory(entry)) {
+					logger.info("Traversing directory="+entry.getFileName());
 					stack.push(entry);
 				}
 				else {
 					if(entry!=null && entry.toString().contains("jpeg")){
 						File file = entry.toFile();
 						files.add(entry);
-						//System.out.println(entry);
+						//logger.info(entry);
 						BufferedImage bimg = ImageIO.read(file);
-						//System.out.println(file.getName());
+						//logger.info(file.getName());
 						if(maxWidth<bimg.getWidth()){
 
 							maxWidth        = bimg.getWidth();
@@ -75,9 +136,15 @@ public class FileUtility {
 
 						if(maxHeight<bimg.getHeight()){
 
-							maxHeight         = bimg.getHeight();
-							maxHeightWd        = bimg.getWidth();
-							maxHeightFilename = file.getName();
+							//maxHeight         = bimg.getHeight();
+							//maxHeightWd        = bimg.getWidth();
+							//maxHeightFilename = file.getName();
+							if(logger.isInfoEnabled()){
+								
+								logger.info("Height>115 Image="+file.getName()
+								+"|Height="+bimg.getHeight()
+								+"|Width="+bimg.getWidth());
+							}
 						}
 					}
 				}
@@ -99,7 +166,7 @@ public class FileUtility {
 				if (file.isFile()) {
 
 					BufferedImage bimg = ImageIO.read(file);
-					//System.out.println(file.getName());
+					//logger.info(file.getName());
 					if(maxWidth<bimg.getWidth()){
 
 						maxWidth        = bimg.getWidth();
@@ -112,6 +179,12 @@ public class FileUtility {
 						maxHeight         = bimg.getHeight();
 						maxHeightWd        = bimg.getWidth();
 						maxHeightFilename = file.getName();
+						if(logger.isInfoEnabled()) {
+
+							logger.info("Max Height Image="+maxHeightFilename
+									+"|Height="+maxHeight
+									+"|Width="+maxHeightWd);
+						}
 					}
 
 				}
@@ -121,11 +194,11 @@ public class FileUtility {
 			e.printStackTrace();
 		}
 
-		System.out.println("Max Width Image="+maxWidthFilename
+		logger.info("Max Width Image="+maxWidthFilename
 				+"|Height="+maxWidthHt
 				+"|Width="+maxWidth);
 
-		System.out.println("Max Height Image="+maxHeightFilename
+		logger.info("Max Height Image="+maxHeightFilename
 				+"|Height="+maxHeight
 				+"|Width="+maxHeightWd);
 	}
