@@ -387,7 +387,12 @@ public class AddressSuffix {
             "NORTHWEST","NW",
             "EVE","MSLOO","MSU",    // Mis spellings
             "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P",
-            "Q","R","S","T","U","V","W","X","Y","Z"
+            "Q","R","S","T","U","V","W","X","Y","Z","DFE",
+            "CENTEP","SFREET","PD","CENFER","SI","STPEET","SF","AVENUF","LAN?","NSLOO",
+            "STRE?T","POAD","CENIER","CENTFR","C?NT?R","PLAC?","STREFT","ROAO","FAST",
+            "LANF","OFC","STRFET","CENIEP","?AST","CFNTER","RO","SIREET","DRTVE","DRLVE","DRIVF",
+            "CONFER","LANA","PLACF","CENTFP","?","AVENU?","CENT?R","DIE","CENT?P","CFNIER","C?NTER",
+            "DPIVE","STR?ET","IANE","DPIV?","BLVO","CENIFP","DRI'VE"
 			));
 
 	// check for valid suffix
