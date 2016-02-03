@@ -72,7 +72,7 @@ public class FiscalEncrypterDecrypter {
 	public static void main(String [] args) throws Exception {
 
 		String plainText = 
-				"21 months";
+				"Sahil Porey";
 		//"Üñited Staté of America";
 
 		String encryptedText ="[5RTgkl9ZxZvkZUdQoAwdYOes17h1CO8ayzQfZtnxf4R8R+aDqZDi4zF0UQ95kb2VXw4/uB5MpIRO8Jrq/JzDczJNG3zyHPNkVbLvJSoM2fcJwZtwxWbgdgjJlSJ5iwmuamybnK7MTHwoBj8av5fcpxKpL0ASjnQa7PB3O2Doi4Q=]";
@@ -88,7 +88,8 @@ public class FiscalEncrypterDecrypter {
 		if(logger.isInfoEnabled()){
 			
 			logger.info(plainText);
-			logger.info("|Encrypted="+encrypted);
+			logger.info("|Encrypted=");
+			logger.info(encrypted);
 			logger.info(encryptedText);
 			logger.info("|Decrypted="+decrypted);
 			
@@ -114,11 +115,12 @@ public class FiscalEncrypterDecrypter {
 			byte[] dataBytes = plainText.getBytes("UTF-16LE");
 			encryptedText = Encrypt(dataBytes);
 
-			if(logger.isDebugEnabled())
-				logger.debug("plaintext="+plainText);
+			if(logger.isDebugEnabled()) {
+			logger.debug("plaintext="+plainText);
 			logger.debug("plaintextFromUTF-16LE="+new String(dataBytes,"UTF-16LE"));
 			logger.debug("plaintextBytesUTF-16LE="+dataBytes.toString());
 			logger.debug("Encrypted="+"["+encryptedText+"]");
+			}
 
 
 		} catch (UnsupportedEncodingException e) {
