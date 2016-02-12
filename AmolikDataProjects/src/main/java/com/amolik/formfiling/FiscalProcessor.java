@@ -114,7 +114,7 @@ public class FiscalProcessor {
 		String outputFilePath = outFileDir
 				+fileSeparator+outFileNameWithoutExt;
 
-		FileUtility.writeDelimitedRecordsToFile(outputFilePath, outputFileDelimiter, recordList);
+		FileUtility.writeDelimitedFiscalRecordsToFile(outputFilePath, outputFileDelimiter, recordList);
 	}
 
 
@@ -909,8 +909,10 @@ public class FiscalProcessor {
 
 				int lastIndexOfComma = field.lastIndexOf(Constants.COMMA);
 
+				if(lastIndexOfComma>1){
 				field=field.substring(0,lastIndexOfComma)+Constants.DOT
 						+field.substring(lastIndexOfComma+1);
+				}
 			}
 		}
 
@@ -933,7 +935,7 @@ public class FiscalProcessor {
 			if(field.charAt(1)=='S') {
 
 				field = field.replaceFirst("S", "5");
-			}
+			};
 			//			String deAccentedField = StringUtility.getDeAccentedString(field);
 			//			deAccentedField = deAccentedField.toUpperCase();
 			//			
