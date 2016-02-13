@@ -72,17 +72,17 @@ public class FiscalEncrypterDecrypter {
 	public static void main(String [] args) throws Exception {
 
 		String plainText = 
-				"Sahil Porey";
+				"Naveen Roy 12345";
 		//"Üñited Staté of America";
 
-		String encryptedText ="[5RTgkl9ZxZvkZUdQoAwdYOes17h1CO8ayzQfZtnxf4R8R+aDqZDi4zF0UQ95kb2VXw4/uB5MpIRO8Jrq/JzDczJNG3zyHPNkVbLvJSoM2fcJwZtwxWbgdgjJlSJ5iwmuamybnK7MTHwoBj8av5fcpxKpL0ASjnQa7PB3O2Doi4Q=]";
+		String encryptedText ="[z5yMwAOx6pEY7vgDjutrPtGVTApp8rBdBsf1Lax19kyJApy9/UvfuvqD2jmcJacYMGXucUpPLDLJpPEcnRqG37KMUlavhI6ZildFoc8jVzQlfv2qxuF0WWGiR/QwrcaNFEjYBXBswj/DeHmojTUFL8Yd/EuWUcmNoLXFsl2/2og=]";
 			//	"[v/VoxTgdvFHDLunz/7KN+ARDJd/hDrm6r0UrRyTYMcJlnfXrKbJB7k6TLXuw56Ygks+gn12U1eTEB7mX+0B1CQ/93xG1U3QMWBoNSFLSsOk3lexufEgYXC5C+rhNnRVxjJpLMm1Z5jNWVHnqh9B3WibHFaneq35nQGWGppXI3LM3P1ZvfVylvw==]";
 
 				//"[j/YmsO3lviCV9jrZdB7/BVIIZ+UUXwCs78dThn4O5zXWpeTu9NqfHM3UmJTRmWghCAQSPQ3I6g8It6lgIJ1yxqhTXw5viJIg2e6Kext2Nwg9tDrlU1JtEx9GDFVCCVgnsYIm15u8uvenLjNZcOGC7eHB46TLGJzepMxgzndmmkzYrYmDg4r2/19QEvj6wMHl]";
 		//"[/XgEkkmnmyjsPZTM10QNR9tQgPLXzfRhaDwsCInPjIrsizIYm/ERv8hoSN7fBJaSaE0mZfToMmodLujWiUqQlULkxXb5S6FgMPw5mGEvLKfpQH4zVXwoC2VYufmyfrp5l4zzuZyrdwog8gNslJ8YKh0iT2+ufyqDBuXhDqOeBc6lJipa1Txq6w==]";
 		//"[HOeiNKHZVEGkFZ8iEFiBDzIBEjghxa86FpR/yMOITYkuTDEf18SfTUt3bkFTlHryUva+Wn63ozExev0GTE99BALXVQqTpe74gwJXNSDpzQZnSLD51rjX589zCLzvzKAsjXSBaOWuFwYUwMrewsSXez58gQBV/6ucgEMbW9vVMfs=]";
 		//"[Y9DCFFIGOJqsXyUa6ye8joEfVzFQTUXidnLpA49yB0SYcoI9+mkHxK5Q50LAZN4P75bZmGSTSBeaq/drdizM3b+2YlGqfkZdGFZI96JnNcNJPizEd/NaKJWTQGk8t8Uyet0XRMDo+MdxX0BLPHhej3dBUJz2RMEk0nZSGK99GXg=]";
-		String encrypted = encryptFiscalText(plainText);
+		String encrypted = getEncryptedFiscalText(plainText);
 		String decrypted = DecryptFiscalText(encryptedText);
 		
 		if(logger.isInfoEnabled()){
@@ -99,8 +99,8 @@ public class FiscalEncrypterDecrypter {
 
 	}
 
-	public static String encryptFiscalText(String plainText)
-			throws GeneralSecurityException {
+	public static String getEncryptedFiscalText(String plainText)
+			 {
 
 		// Algo 1. Add plainText + "#!#" + systemId
 		// 2. convert databytes to UTF-16LE
@@ -114,6 +114,7 @@ public class FiscalEncrypterDecrypter {
 		try {
 			byte[] dataBytes = plainText.getBytes("UTF-16LE");
 			encryptedText = Encrypt(dataBytes);
+			encryptedText = encryptedText.replaceAll("\\r|\\n", "");
 
 			if(logger.isDebugEnabled()) {
 			logger.debug("plaintext="+plainText);
@@ -123,7 +124,7 @@ public class FiscalEncrypterDecrypter {
 			}
 
 
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException | GeneralSecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
