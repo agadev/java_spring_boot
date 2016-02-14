@@ -392,7 +392,10 @@ public class AddressSuffix {
             "STRE?T","POAD","CENIER","CENTFR","C?NT?R","PLAC?","STREFT","ROAO","FAST",
             "LANF","OFC","STRFET","CENIEP","?AST","CFNTER","RO","SIREET","DRTVE","DRLVE","DRIVF",
             "CONFER","LANA","PLACF","CENTFP","?","AVENU?","CENT?R","DIE","CENT?P","CFNIER","C?NTER",
-            "DPIVE","STR?ET","IANE","DPIV?","BLVO","CENIFP","DRI'VE"
+            "DPIVE","STR?ET","IANE","DPIV?","BLVO","CENIFP","DRI'VE","AV?","DRIV?","CFNTEP","PIAC?",
+            "CFNT?R","CENFER","STPE?T","EASF","AVFNUF","CENI?R","AVFNU?","DPIVF","SIRFET",
+            "DRLV?","C?NTFR","I.ANF","OFE","SIR?ET","DPLVE","CFNTFR","CFNT?P","SFREEF","AVF","DPTV?",
+            "?ASF","STP?ET","PO","DRW?"
 			));
 
 	// check for valid suffix
