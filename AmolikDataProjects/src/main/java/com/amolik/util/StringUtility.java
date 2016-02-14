@@ -35,7 +35,7 @@ public class StringUtility {
 
 	public static String trim(String s){
 
-		if(s != null||!s.equals("null")) {
+		if(s != null && !s.equals(Constants.EMPTY_STRING)) {
 
 			s = s.trim();
 		}
