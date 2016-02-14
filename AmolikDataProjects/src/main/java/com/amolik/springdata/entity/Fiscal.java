@@ -3,8 +3,10 @@ package com.amolik.springdata.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="fiscaltest")
 @NamedQuery(name = "Fiscal.findByTheFiscalImageFileName", query = "from Fiscal u where u.imageFileName = ?1")
 public class Fiscal {
 
