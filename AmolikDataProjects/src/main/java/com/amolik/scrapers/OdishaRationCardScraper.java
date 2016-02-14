@@ -148,15 +148,9 @@ public class OdishaRationCardScraper {
 					+"| toal recordCount=" 
 					+ (beanList.size())); 
 		}
-		// Now write to excel
-		try {
-			ExcelUtil.generateExcelFromBean(beanList,
-					excelTemplateFileName, excelTemplateFileName, excelDestFileName, "rationCard");
-
-		} catch (InvalidFormatException | IOException e) {
-			// TODO Auto-generated catch block
-			logger.error("processBlock(WebDriver, int, int, String, String)", e); //$NON-NLS-1$
-		}
+	
+		ExcelUtil.generateExcelFromBean(beanList,
+				excelTemplateFileName, excelTemplateFileName, excelDestFileName, "rationCard");
 
 	}
 
