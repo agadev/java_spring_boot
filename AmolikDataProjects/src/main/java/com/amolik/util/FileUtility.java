@@ -37,7 +37,9 @@ public class FileUtility {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		String baseDir = "E:\\FISCAL_DATA\\FEB2016";
+		String baseDir = 
+				//"E:\\FISCAL_DATA\\SYSTEM4";
+				"E:\\FISCAL_DATA\\FEB2016";
 		//findMaxWidthImage(baseDir);
 		//findMaxWidthImageUsingNio(Paths.get(baseDir));
 		FileUtility fileUtil = new FileUtility();
@@ -54,7 +56,7 @@ public class FileUtility {
 		}
 	}
 
-	public static void writeDelimitedRecordsToFile(String outputFilePath,
+	public static void writeDelimitedFiscalRecordsToFile(String outputFilePath,
 			String outputFileDelimiter,List<FiscalRecord> recordList) {
 
 		if(logger.isInfoEnabled()){
@@ -96,6 +98,55 @@ public class FileUtility {
 						+record.getCarrierName()
 						+outputFileDelimiter+record.getEisCode()+outputFileDelimiter+"\n"
 						+"================================================================================================="+"\n"
+						);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		 
+	}
+	
+	public static void writeCsvFiscalRecordsToFile(String outputFilePath,
+			String outputFileDelimiter,List<FiscalRecord> recordList) {
+
+		if(logger.isInfoEnabled()){
+
+			logger.info("Writing csv record to file="+outputFilePath);
+		}
+		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFilePath))) {
+
+			for (FiscalRecord record : recordList) {
+				
+				writer.write(record.getImageFileName()
+						+outputFileDelimiter+record.getSrNo()
+						+outputFileDelimiter+record.getEmpIdNo()
+						+outputFileDelimiter+record.getOccuranceNo()
+						+outputFileDelimiter+record.getLoanFileNo()
+						+outputFileDelimiter+record.getLoanAmount()
+						+outputFileDelimiter+record.getRateOfInterest()
+						+outputFileDelimiter+record.getTenure()
+						+outputFileDelimiter+record.getTotalLoan()
+						+outputFileDelimiter+record.getEmi()
+						+outputFileDelimiter+record.getOtherLoans()
+						+outputFileDelimiter+record.getInitials()
+						+outputFileDelimiter+record.getEmpName()
+						+outputFileDelimiter+record.getAddress()
+						+outputFileDelimiter+record.getCity()
+						+outputFileDelimiter+record.getState()
+						+outputFileDelimiter+record.getZip()
+						+outputFileDelimiter+record.getCountry()
+						+outputFileDelimiter+record.getContactMode()
+						+outputFileDelimiter+record.getMaritalStatus()
+						+outputFileDelimiter+record.getRefName()
+						+outputFileDelimiter+record.getYearsOfEmployment()
+						+outputFileDelimiter+record.getDesignation()
+						+outputFileDelimiter+record.getDepartment()
+						+outputFileDelimiter+record.getPerformance()
+						+outputFileDelimiter+record.getBasicSalary()
+						+outputFileDelimiter+record.getCenterName()
+						+outputFileDelimiter+record.getIssuerBank()
+						+outputFileDelimiter+record.getCarrierName()
+						+outputFileDelimiter+record.getEisCode()+"\n"
 						);
 			}
 		} catch (IOException e) {
